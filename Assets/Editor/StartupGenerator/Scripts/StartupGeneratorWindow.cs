@@ -23,6 +23,13 @@ public class StartupGeneratorWindow : EditorWindow
     // Nouveaux paramètres OpenAI
     private string selectedModel = "gpt-3.5-turbo"; // Modèle OpenAI sélectionné
     private readonly string[] modelOptions = { "gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo" }; // Modèles disponibles
+    
+    private string selectedImageModel = "dall-e-3";
+    private readonly string[] imageModelOptions = { "dall-e-3" };
+
+    private string selectedImageSize = "256x256";
+    private readonly string[] imageSizeOptions = { "256x256","512x512","1024x1024" };
+
     private int maxTokens = 200; // Nombre maximum de tokens
     private float temperature = 0.7f; // Température
 
@@ -167,11 +174,11 @@ private void LoadFounderImagePrompt()
         showConfiguration = EditorGUILayout.Foldout(showConfiguration, "Configuration");
         if (showConfiguration)
         {
-            GUILayout.Label("OpenAI Parameters:", EditorStyles.boldLabel);
+            GUILayout.Label("OpenAI text Parameters:", EditorStyles.boldLabel);
 
             // Modèle OpenAI
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("OpenAI Model:", GUILayout.Width(150));
+            GUILayout.Label("OpenAI Text Model:", GUILayout.Width(150));
             selectedModel = modelOptions[EditorGUILayout.Popup(System.Array.IndexOf(modelOptions, selectedModel), modelOptions)];
             EditorGUILayout.EndHorizontal();
 
@@ -188,6 +195,18 @@ private void LoadFounderImagePrompt()
             EditorGUILayout.EndHorizontal();
 
             GUILayout.Space(10);
+            GUILayout.Label("OpenAI image Parameters:", EditorStyles.boldLabel);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Image Size:", GUILayout.Width(150));
+            selectedImageSize = imageSizeOptions[EditorGUILayout.Popup(System.Array.IndexOf(imageSizeOptions, selectedImageSize), imageSizeOptions)];
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("OpenAI Image Model:", GUILayout.Width(150));
+            selectedImageModel = imageModelOptions[EditorGUILayout.Popup(System.Array.IndexOf(imageModelOptions, selectedImageModel), imageModelOptions)];
+            EditorGUILayout.EndHorizontal();
+
+
+
 
             GUILayout.Label("System Prompt:", EditorStyles.label);
 
@@ -355,8 +374,8 @@ private void LoadFounderImagePrompt()
 
         try
         {
-            Debug.Log("Generating founder image... prompt:" + prompt);
-            Texture2D image = await OpenAIClient.SendPromptImageAsync(prompt);
+            Debug.Log("Generating founder image..." + selectedImageSize + "/" + selectedImageModel + " prompt:" + prompt);
+            Texture2D image = await OpenAIClient.SendPromptImageAsync(prompt, selectedImageSize, selectedImageModel);
 
             if (image != null)
             {

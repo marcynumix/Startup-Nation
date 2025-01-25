@@ -1,1 +1,2 @@
-Generate a modern, stylized, and cute 3D portrait of the founder of a startup. The details about the founder are provided in the following JSON format: {json}. Ensure the image captures a friendly and approachable personality with vibrant colors and smooth textures, reflecting a contemporary and creative style.
+Génère le portrait du fondateur de la startup dont tu trouveras les informations au format json suivant : {json}
+l'image devra adopter un style bande dessinée belge avec une ligne claire et ne devra comporter aucun de texte.

@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-using Unity.EditorCoroutines.Editor; // Nécessaire pour les coroutines dans l'éditeur
+using Unity.EditorCoroutines.Editor;
+using System.Drawing; // Nécessaire pour les coroutines dans l'éditeur
 
 public class OpenAIClient : MonoBehaviour
 {
@@ -63,7 +64,7 @@ public class OpenAIClient : MonoBehaviour
     /// </summary>
     /// <param name="prompt">Le prompt pour générer l'image.</param>
     /// <returns>Une Texture2D représentant l'image générée.</returns>
-    public static async Task<Texture2D> SendPromptImageAsync(string prompt)
+    public static async Task<Texture2D> SendPromptImageAsync(string prompt, string size, string model)
     {
         if (string.IsNullOrEmpty(apiKey))
         {
@@ -80,19 +81,20 @@ public class OpenAIClient : MonoBehaviour
         return await Task.Run(() =>
         {
             var tcs = new TaskCompletionSource<Texture2D>();
-            EditorCoroutineUtility.StartCoroutineOwnerless(SendImageRequest(prompt, tcs));
+            EditorCoroutineUtility.StartCoroutineOwnerless(SendImageRequest(prompt, size, model, tcs));
             return tcs.Task;
         });
     }
 
-    private static IEnumerator SendImageRequest(string prompt, TaskCompletionSource<Texture2D> tcs)
+    private static IEnumerator SendImageRequest(string prompt, string size, string model, TaskCompletionSource<Texture2D> tcs)
     {
         // Préparer les données de la requête
         ImageRequest requestData = new ImageRequest
         {
             prompt = prompt,
             n = 1,
-            size = "1024x1024"
+            size = "1024x1024",
+            model = "dall-e-3" // Ajouter le modèle explicitement
         };
 
         string json = JsonUtility.ToJson(requestData);
@@ -227,6 +229,7 @@ public class ImageRequest
     public string prompt;
     public int n;
     public string size;
+    public string model;
 }
 
 [System.Serializable]
