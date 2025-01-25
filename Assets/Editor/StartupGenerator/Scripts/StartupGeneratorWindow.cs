@@ -18,7 +18,7 @@ public class StartupGeneratorWindow : EditorWindow
 
     private int numberOfStartups = 1; // Nombre de startups à générer
     private bool deleteOldData = false; // Supprimer les anciennes données (checkbox)
-    private bool generateImage = false; // Générer une image (checkbox)
+    private bool generateImage = true; // Générer une image (checkbox)
 
     // Nouveaux paramètres OpenAI
     private string selectedModel = "gpt-3.5-turbo"; // Modèle OpenAI sélectionné
@@ -30,7 +30,7 @@ public class StartupGeneratorWindow : EditorWindow
     private string selectedImageSize = "1024x1024";
     private readonly string[] imageSizeOptions = { "1024x1024" };
 
-    private int maxTokens = 200; // Nombre maximum de tokens
+    private int maxTokens = 400; // Nombre maximum de tokens
     private float temperature = 0.7f; // Température
 
     [MenuItem("Tools/Startup Generator")]
@@ -348,8 +348,12 @@ public class StartupGeneratorWindow : EditorWindow
                 // Appeler l'API OpenAI pour chaque startup générée et attendre la réponse
                 string response = await OpenAIClient.SendPromptAsync(systemPrompt, finalPrompt, selectedModel, maxTokens, temperature);
 
+
                 // Parse la réponse pour extraire le contenu JSON
                 string content = ExtractJsonContentFromResponse(response);
+
+                Debug.Log("Response received" + content);
+
                 if (!string.IsNullOrEmpty(content))
                 {
                     SaveGeneratedStartupToFile(content); // Sauvegarder le contenu JSON dans un fichier
@@ -380,7 +384,7 @@ public class StartupGeneratorWindow : EditorWindow
     private async Task GenerateFounderImage(string jsonContent)
     {
         // Construire le prompt basé sur le contenu JSON
-        string prompt = founderImagePrompt.Replace("{json}", jsonContent);
+        string prompt = ExtractImagePromptFromJson(jsonContent);
 
         try
         {
@@ -599,6 +603,21 @@ public class StartupGeneratorWindow : EditorWindow
         }
     }
 
+    private string ExtractImagePromptFromJson(string jsonContent)
+    {
+        try
+        {
+            // Désérialiser le JSON partiellement pour accéder uniquement à l'ImagePrompt
+            var startupData = JsonUtility.FromJson<StartupData>(jsonContent);
+            return startupData?.ImagePrompt ?? "";
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to extract 'ImagePrompt' from JSON: {ex.Message}");
+            return null;
+        }
+    }
+
     private string ToCamelCase(string input)
     {
         if (string.IsNullOrEmpty(input)) return "";
@@ -678,7 +697,9 @@ public class StartupGeneratorWindow : EditorWindow
     private class StartupData
     {
         public string StartupName;
+        public string ImagePrompt;
     }
+
     [System.Serializable]
     private class StartupList
     {
