@@ -86,15 +86,15 @@ public class OpenAIClient : MonoBehaviour
         });
     }
 
-    private static IEnumerator SendImageRequest(string prompt, string size, string model, TaskCompletionSource<Texture2D> tcs)
+    private static IEnumerator SendImageRequest(string prompt, string _size, string _model, TaskCompletionSource<Texture2D> tcs)
     {
         // Préparer les données de la requête
         ImageRequest requestData = new ImageRequest
         {
             prompt = prompt,
             n = 1,
-            size = "1024x1024",
-            model = "dall-e-3" // Ajouter le modèle explicitement
+            size = _size,
+            model = _model // Ajouter le modèle explicitement
         };
 
         string json = JsonUtility.ToJson(requestData);
