@@ -27,11 +27,14 @@ public static class OpenAIClient
     }
 
     /// <summary>
-    /// Envoie un prompt à OpenAI et retourne la réponse.
+    /// Envoie un prompt à OpenAI avec les paramètres personnalisés et retourne la réponse.
     /// </summary>
     /// <param name="prompt">Le prompt à envoyer.</param>
+    /// <param name="model">Le modèle OpenAI à utiliser.</param>
+    /// <param name="maxTokens">Le nombre maximum de tokens pour la réponse.</param>
+    /// <param name="temperature">La température pour la génération de texte.</param>
     /// <returns>La réponse de l'API sous forme de texte.</returns>
-    public static async Task<string> SendPromptAsync(string prompt)
+    public static async Task<string> SendPromptAsync(string systemPrompt, string prompt, string model, int maxTokens, float temperature)
     {
         if (string.IsNullOrEmpty(apiKey))
         {
@@ -49,24 +52,24 @@ public static class OpenAIClient
         return await Task.Run(() =>
         {
             var tcs = new TaskCompletionSource<string>();
-            EditorCoroutineUtility.StartCoroutineOwnerless(SendRequest(prompt, tcs));
+            EditorCoroutineUtility.StartCoroutineOwnerless(SendRequest(systemPrompt, prompt, model, maxTokens, temperature, tcs));
             return tcs.Task;
         });
     }
 
-    private static IEnumerator SendRequest(string prompt, TaskCompletionSource<string> tcs)
+    private static IEnumerator SendRequest(string systemPrompt, string prompt, string model, int maxTokens, float temperature, TaskCompletionSource<string> tcs)
     {
         // Préparer les données de la requête
         ChatRequest requestData = new ChatRequest
         {
-            model = "gpt-3.5-turbo",
+            model = model,
             messages = new List<Message>
             {
-                new Message { role = "system", content = "You are a helpful assistant." },
+                new Message { role = "system", content = systemPrompt }, // Utiliser le system prompt personnalisé
                 new Message { role = "user", content = prompt }
             },
-            max_tokens = 100,
-            temperature = 0.7f
+            max_tokens = maxTokens,
+            temperature = temperature
         };
 
         string json = JsonUtility.ToJson(requestData);
@@ -79,24 +82,21 @@ public static class OpenAIClient
             request.SetRequestHeader("Content-Type", "application/json");
             request.SetRequestHeader("Authorization", "Bearer " + apiKey);
 
-            Debug.Log($"Request Details:\nURL: {apiUrl}\nPayload: {json}\nAuthorization: Bearer {apiKey.Substring(0, 4)}****");
-
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
             {
                 string response = request.downloadHandler.text;
-                Debug.Log("Response: " + response);
                 tcs.SetResult(response); // Renvoie la réponse au Task
             }
             else
             {
                 string error = $"Error: {request.error}\nResponse Code: {request.responseCode}\nResponse Body: {request.downloadHandler.text}";
-                Debug.LogError(error);
                 tcs.SetResult(error); // Renvoie l'erreur au Task
             }
         }
     }
+
 }
 
 // Classes de requête et réponse

@@ -7,13 +7,20 @@ public class StartupGeneratorWindow : EditorWindow
 {
     private Dictionary<string, List<string>> keywordLists = new Dictionary<string, List<string>>();
     private Vector2 scrollPosition; // Pour le défilement horizontal des mots-clés
+    private string systemPrompt = ""; // Contenu du fichier de system prompt
     private string startupPrompt = ""; // Contenu du fichier de prompt
     private bool showConfiguration = true; // État du groupe "Configuration"
     private bool showConfigurationData = true; // État du groupe "Configuration Data"
-    private bool showGenerateStartups = false; // État du groupe "Generate Startups"
+    private bool showGenerateStartups = true; // État du groupe "Generate Startups"
 
     private int numberOfStartups = 1; // Nombre de startups à générer
     private bool deleteOldData = false; // Supprimer les anciennes données (checkbox)
+
+    // Nouveaux paramètres OpenAI
+    private string selectedModel = "gpt-3.5-turbo"; // Modèle OpenAI sélectionné
+    private readonly string[] modelOptions = { "gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo" }; // Modèles disponibles
+    private int maxTokens = 200; // Nombre maximum de tokens
+    private float temperature = 0.7f; // Température
 
     [MenuItem("Tools/Startup Generator")]
     public static void ShowWindow()
@@ -25,6 +32,7 @@ public class StartupGeneratorWindow : EditorWindow
     {
         LoadKeywordFiles();
         LoadStartupPrompt();
+        LoadSystemPrompt();
     }
 
     private void LoadKeywordFiles()
@@ -47,6 +55,38 @@ public class StartupGeneratorWindow : EditorWindow
         else
         {
             Debug.LogError($"Data folder not found at: {dataFolderPath}");
+        }
+    }
+
+    private void LoadSystemPrompt()
+    {
+        // Chemin vers le fichier de system prompt
+        string systemPromptFilePath = Path.Combine(Application.dataPath, "StartupGenerator/Prompts/startup-generation-systemprompt.txt");
+
+        if (File.Exists(systemPromptFilePath))
+        {
+            systemPrompt = File.ReadAllText(systemPromptFilePath); // Lire tout le fichier
+        }
+        else
+        {
+            Debug.LogError($"System prompt file not found at: {systemPromptFilePath}");
+            systemPrompt = "System prompt file not found!";
+        }
+    }
+
+    private void SaveSystemPrompt()
+    {
+        // Chemin vers le fichier de system prompt
+        string systemPromptFilePath = Path.Combine(Application.dataPath, "StartupGenerator/Prompts/startup-generation-systemprompt.txt");
+
+        try
+        {
+            File.WriteAllText(systemPromptFilePath, systemPrompt); // Sauvegarder le contenu dans le fichier
+            Debug.Log("System prompt saved successfully.");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to save system prompt: {ex.Message}");
         }
     }
 
@@ -90,12 +130,44 @@ public class StartupGeneratorWindow : EditorWindow
         showConfiguration = EditorGUILayout.Foldout(showConfiguration, "Configuration");
         if (showConfiguration)
         {
-            GUILayout.Label("Startup Generation Prompt:", EditorStyles.label);
+            GUILayout.Label("OpenAI Parameters:", EditorStyles.boldLabel);
+
+            // Modèle OpenAI
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("OpenAI Model:", GUILayout.Width(150));
+            selectedModel = modelOptions[EditorGUILayout.Popup(System.Array.IndexOf(modelOptions, selectedModel), modelOptions)];
+            EditorGUILayout.EndHorizontal();
+
+            // Max Tokens
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Max Tokens:", GUILayout.Width(150));
+            maxTokens = EditorGUILayout.IntField(maxTokens, GUILayout.Width(50));
+            EditorGUILayout.EndHorizontal();
+
+            // Température
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Temperature:", GUILayout.Width(150));
+            temperature = EditorGUILayout.FloatField(temperature, GUILayout.Width(50));
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(10);
+
+            GUILayout.Label("System Prompt:", EditorStyles.label);
 
             var textAreaStyle = new GUIStyle(EditorStyles.textArea)
             {
                 wordWrap = true // Active le retour à la ligne automatique
             };
+            systemPrompt = EditorGUILayout.TextArea(systemPrompt, textAreaStyle, GUILayout.Height(50));
+
+            if (GUILayout.Button("Save System Prompt"))
+            {
+                SaveSystemPrompt(); // Sauvegarde du system prompt
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Startup Generation Prompt:", EditorStyles.label);
+
             startupPrompt = EditorGUILayout.TextArea(startupPrompt, textAreaStyle, GUILayout.Height(100));
 
             if (GUILayout.Button("Save Prompt"))
@@ -108,8 +180,11 @@ public class StartupGeneratorWindow : EditorWindow
             showConfigurationData = EditorGUILayout.Foldout(showConfigurationData, "Data");
             if (showConfigurationData)
             {
-                // Barre de défilement pour les données
-                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(position.height - 300));
+                // Conteneur avec une hauteur fixe de 500 pixels
+                EditorGUILayout.BeginVertical(GUILayout.Height(200));
+                
+                // Barre de défilement à l'intérieur du conteneur
+                scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
                 EditorGUILayout.BeginHorizontal();
 
@@ -119,14 +194,14 @@ public class StartupGeneratorWindow : EditorWindow
                 }
 
                 EditorGUILayout.EndHorizontal();
-                EditorGUILayout.EndScrollView();
-            }
-            
-            
 
+                EditorGUILayout.EndScrollView();
+                EditorGUILayout.EndVertical();
+            }
             if (GUILayout.Button("Reload Data"))
             {
                 LoadKeywordFiles(); // Recharger les fichiers de données
+                LoadSystemPrompt(); // Recharger le fichier de system prompt
                 LoadStartupPrompt(); // Recharger le fichier de prompt
             }
         }
@@ -181,8 +256,8 @@ public class StartupGeneratorWindow : EditorWindow
         {
             string finalPrompt = GeneratePromptWithKeywords(startupPrompt);
 
-            // Appeler l'API OpenAI pour chaque startup générée
-            string response = await OpenAIClient.SendPromptAsync(finalPrompt);
+            // Appeler l'API OpenAI pour chaque startup générée avec les paramètres personnalisés
+            string response = await OpenAIClient.SendPromptAsync(systemPrompt, finalPrompt, selectedModel, maxTokens, temperature);
 
             // Afficher le résultat dans la console
             Debug.Log($"Generated Startup #{i + 1}: {response}");
@@ -211,5 +286,4 @@ public class StartupGeneratorWindow : EditorWindow
 
         return prompt;
     }
-
 }

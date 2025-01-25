@@ -1,1 +1,3 @@
-Propose un pitch de startup absurde sur la thématique "{thematics}" incluant la technologie "{technologies}" présentée par un fondateur honnête et incompétent (un nom et 3 phrases maximum)
+Génère une startup absurde sur la thématique "{thematics}" incluant la technologie "{technologies}" présentée par un fondateur {foundertraits} (un nom et 2 phrases maximum). Le taux de réussite de cette startup sera de {successrate}
+Ton retour sera au format json suivant :
+{ "StartupName": "Nom de la startup", "FounderName": "Nom du fondateur rigolo", "Pitch": "Pitch absurde en deux phrases maximum","SuccessRate": 80,"foundertrait":"foundertraits"}
