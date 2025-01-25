@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.AI;
 
 public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
@@ -26,6 +27,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public float swipeSpeed = 10f;
     public float validationAnimationDuration = 1f;
     public AnimationCurve validationAnimationCurve;
+    public float flipDuration = 0.5f;
     bool isAnimating = false;
 
     private RectTransform rectTransform;
@@ -127,6 +129,11 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     {
         isAnimating = true;
 
+        if(swipeDirection == 1)
+            Player.instance.Money -= 100000;
+        else
+            Player.instance.Money += 100000;
+
         RectTransform target = swipeDirection == 1 ? validateRightRef : validateLeftRef;
         float p = 0;
         float t = 0;
@@ -149,6 +156,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         StartupInvestCard.Instance.LoadRandomStartup();
 
+
         yield return new WaitForSeconds(0.1f);
         // Return new Card !
 
@@ -156,10 +164,10 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         // Animate back face card towards 90°
         swipeBackgroundImage.color = swipeBackgroundColor2;
         float t2 = 0;
-        while (t2 < validationAnimationDuration)
+        while (t2 < flipDuration)
         {
             t2 += Time.deltaTime;
-            p = t2 / validationAnimationDuration;
+            p = t2 / flipDuration;
             swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
             yield return null;
         }
@@ -170,10 +178,10 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         swipeableElement.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
         swipeableCanvasGroup.alpha = 1;
         t2 = 0;
-        while (t2 < validationAnimationDuration)
+        while (t2 < flipDuration)
         {
             t2 += Time.deltaTime;
-            p = t2 / validationAnimationDuration;
+            p = t2 / flipDuration;
             swipeableElement.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 90, 0)), Quaternion.Euler(new Vector3(0, 0, 0)), validationAnimationCurve.Evaluate(p));
             yield return null;
         }

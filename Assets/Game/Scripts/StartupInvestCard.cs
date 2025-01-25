@@ -12,7 +12,7 @@ public class StartupInvestCard : MonoBehaviour
     public Image founderImage;
     public TMPro.TextMeshProUGUI startupPitch;
     public TMPro.TextMeshProUGUI founderName;
-    public Button nextButton;
+
 
     private string startupsFilePath;
     public List<string> startupNames;
@@ -29,9 +29,6 @@ public class StartupInvestCard : MonoBehaviour
 
         // Charger la liste des startups
         StartCoroutine(LoadStartupsList());
-
-        // Ajouter l'action au bouton "Next"
-        nextButton.onClick.AddListener(() => LoadRandomStartupCoroutine());
     }
 
     private IEnumerator LoadStartupsList()
