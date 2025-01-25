@@ -7,6 +7,7 @@ using System.IO;
 
 public class StartupInvestCard : MonoBehaviour
 {
+    public static StartupInvestCard Instance { get; private set; }
     public TMPro.TextMeshProUGUI startupName;
     public Image founderImage;
     public TMPro.TextMeshProUGUI startupPitch;
@@ -15,6 +16,11 @@ public class StartupInvestCard : MonoBehaviour
 
     private string startupsFilePath;
     public List<string> startupNames;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -25,7 +31,7 @@ public class StartupInvestCard : MonoBehaviour
         StartCoroutine(LoadStartupsList());
 
         // Ajouter l'action au bouton "Next"
-        nextButton.onClick.AddListener(() => StartCoroutine(LoadRandomStartup()));
+        nextButton.onClick.AddListener(() => LoadRandomStartupCoroutine());
     }
 
     private IEnumerator LoadStartupsList()
@@ -51,10 +57,14 @@ public class StartupInvestCard : MonoBehaviour
         }
 
         // Charger une startup aléatoire au démarrage
-        StartCoroutine(LoadRandomStartup());
+        StartCoroutine(LoadRandomStartupCoroutine());
     }
 
-    private IEnumerator LoadRandomStartup()
+    public void LoadRandomStartup(){
+        StartCoroutine(LoadRandomStartupCoroutine());
+    }
+
+    private IEnumerator LoadRandomStartupCoroutine()
     {
         if (startupNames == null || startupNames.Count == 0)
         {

@@ -1,20 +1,32 @@
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     public RectTransform swipeableElement;
+    public CanvasGroup swipeableCanvasGroup;
+    public RectTransform swipeBackFaceCard;
+    public Image swipeBackgroundImage;
+    public Color swipeBackgroundColor1;
+    public Color swipeBackgroundColor2;
+    
     [Header("Positions de référence")]
-    public RectTransform leftPosition;
-    public RectTransform middlePosition;
-    public RectTransform rightPosition;
+    public RectTransform swipeLeftRef;
+    public RectTransform swipeMiddleRef;
+    public RectTransform swipeRightRef;
+    public RectTransform validateLeftRef;
+    public RectTransform validateRightRef;
 
     [Header("Paramètres de transition")]
     public float dragTreshold = 200f;
     public float centerTreshold = 50f;
     public float swipeSpeed = 10f;
-    
+    public float validationAnimationDuration = 1f;
+    public AnimationCurve validationAnimationCurve;
+    bool isAnimating = false;
 
     private RectTransform rectTransform;
     private Vector2 startPointerPosition;
@@ -29,16 +41,21 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     private Vector2 dragDelta= Vector2.zero;
 
     private RectTransform currentTarget;
+    private int swipeDirection=0;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
         targetPosition = swipeableElement.anchoredPosition;
         targetRotation = swipeableElement.rotation;
+
+        swipeableElement.gameObject.SetActive(true);
     }
 
     private void Update()
     {
+        if(isAnimating)
+            return;
         if (isDragging)
         {
             swipeableElement.anchoredPosition = Vector2.Lerp(swipeableElement.anchoredPosition, targetPosition, swipeSpeed * Time.deltaTime);
@@ -48,21 +65,23 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if(isAnimating)
+            return;
+
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out startPointerPosition))
             return;
 
-        isDragging = true;
+        
         dragDelta = Vector2.zero;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if(isAnimating)
+            return;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out currentPointerPosition))
             return;
-
-        
-        
-
+        isDragging = true;
         dragDelta = currentPointerPosition - startPointerPosition;
         RectTransform target = null;
 
@@ -70,20 +89,23 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         
         if(dragDelta.x > centerTreshold)
         {
-            target = rightPosition;
+            target = swipeRightRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
+            swipeDirection=1;
         }
         else if (dragDelta.x < -centerTreshold)
         {
 
-            target = leftPosition;
+            target = swipeLeftRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
+            swipeDirection=-1;
 
         }
         else
         {
-            target = middlePosition;
+            target = swipeMiddleRef;
             p = 1;
+            swipeDirection=0;
         }
         targetPosition = Vector2.Lerp(initialElementPosition, target.anchoredPosition, p);
         targetRotation = Quaternion.Lerp(swipeableElement.rotation, target.rotation, p);
@@ -92,9 +114,71 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if(isAnimating)
+            return;
         isDragging = false;
 
+        if(swipeDirection!=0){
+            StartCoroutine(ValidateSwipe());
+        }
     }
 
+    private IEnumerator ValidateSwipe()
+    {
+        isAnimating = true;
 
+        RectTransform target = swipeDirection == 1 ? validateRightRef : validateLeftRef;
+        float p = 0;
+        float t = 0;
+        Vector2 initialPosition = swipeableElement.anchoredPosition;
+        Quaternion initialRotation = swipeableElement.rotation;
+
+        while (t < validationAnimationDuration)
+        {
+            t += Time.deltaTime;
+            p = t / validationAnimationDuration;
+            swipeableElement.anchoredPosition = Vector2.Lerp(initialPosition, target.anchoredPosition, validationAnimationCurve.Evaluate(p));
+            swipeableElement.rotation = Quaternion.Lerp(initialRotation, target.rotation, validationAnimationCurve.Evaluate(p));
+            swipeableCanvasGroup.alpha = validationAnimationCurve.Evaluate(1 - p);
+            yield return null;
+        }
+
+        swipeableElement.anchoredPosition = target.anchoredPosition;
+        swipeableElement.rotation = target.rotation;
+        swipeableCanvasGroup.alpha = 0;
+
+        StartupInvestCard.Instance.LoadRandomStartup();
+
+        yield return new WaitForSeconds(0.1f);
+        // Return new Card !
+
+        swipeBackFaceCard.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        // Animate back face card towards 90°
+        swipeBackgroundImage.color = swipeBackgroundColor2;
+        float t2 = 0;
+        while (t2 < validationAnimationDuration)
+        {
+            t2 += Time.deltaTime;
+            p = t2 / validationAnimationDuration;
+            swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
+            yield return null;
+        }
+
+
+        // Animate SwipeElement card towards 0°
+        swipeableElement.anchoredPosition = swipeMiddleRef.anchoredPosition;
+        swipeableElement.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+        swipeableCanvasGroup.alpha = 1;
+        t2 = 0;
+        while (t2 < validationAnimationDuration)
+        {
+            t2 += Time.deltaTime;
+            p = t2 / validationAnimationDuration;
+            swipeableElement.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 90, 0)), Quaternion.Euler(new Vector3(0, 0, 0)), validationAnimationCurve.Evaluate(p));
+            yield return null;
+        }
+
+        swipeBackgroundImage.color = swipeBackgroundColor1;
+        isAnimating = false;
+    }
 }
