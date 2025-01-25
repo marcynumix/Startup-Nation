@@ -1,2 +1,1 @@
-Génère le portrait du fondateur de la startup dont tu trouveras les informations au format json suivant : {json}
-l'image devra adopter un style bande dessinée belge avec une ligne claire et ne devra comporter aucun de texte.
+Generate an image with no text, depicting the portrait of the founder of a startup.  {json}. "The image should be in a funny 3d and stylized illustration style."

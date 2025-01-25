@@ -27,8 +27,8 @@ public class StartupGeneratorWindow : EditorWindow
     private string selectedImageModel = "dall-e-3";
     private readonly string[] imageModelOptions = { "dall-e-3" };
 
-    private string selectedImageSize = "256x256";
-    private readonly string[] imageSizeOptions = { "256x256","512x512","1024x1024" };
+    private string selectedImageSize = "1024x1024";
+    private readonly string[] imageSizeOptions = { "1024x1024" };
 
     private int maxTokens = 200; // Nombre maximum de tokens
     private float temperature = 0.7f; // Température
@@ -197,7 +197,7 @@ private void LoadFounderImagePrompt()
             GUILayout.Space(10);
             GUILayout.Label("OpenAI image Parameters:", EditorStyles.boldLabel);
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label("Image Size:", GUILayout.Width(150));
+            GUILayout.Label("OpenAI Image Size:", GUILayout.Width(150));
             selectedImageSize = imageSizeOptions[EditorGUILayout.Popup(System.Array.IndexOf(imageSizeOptions, selectedImageSize), imageSizeOptions)];
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
