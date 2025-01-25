@@ -72,7 +72,7 @@ public class StartupInvestCard : MonoBehaviour
 
         if (jsonRequest.result != UnityWebRequest.Result.Success)
         {
-            Debug.LogError($"Erreur lors du chargement du fichier JSON : {jsonRequest.error}");
+            Debug.LogError($"Erreur lors du chargement du fichier JSON path={jsonFilePath} error:{jsonRequest.error}");
             yield break;
         }
 
@@ -103,7 +103,8 @@ public class StartupInvestCard : MonoBehaviour
             }
             else
             {
-                Debug.LogError($"Erreur lors du chargement de l'image : {request.error}");
+                Debug.LogWarning($"Erreur lors du chargement de l'image : {request.error}");
+                founderImage.sprite=null;
             }
         }
     }

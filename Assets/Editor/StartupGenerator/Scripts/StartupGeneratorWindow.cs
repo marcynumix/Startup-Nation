@@ -296,6 +296,16 @@ private void LoadFounderImagePrompt()
             {
                 GenerateStartups();
             }
+
+            GUILayout.Space(10);
+
+            // Bouton pour reconstruire startups.json
+            if (GUILayout.Button("Rebuild Startup list file (startups.json)"))
+            {
+                UpdateStartupsJson();
+                Debug.Log("startups.json has been rebuilt.");
+            }
+
         }
     }
 
@@ -463,14 +473,19 @@ private void LoadFounderImagePrompt()
 
         try
         {
-            File.WriteAllText(filePath, content); // Écraser le fichier existant
+            // Sauvegarder le contenu de la startup
+            File.WriteAllText(filePath, content);
             Debug.Log($"Startup saved to: {filePath}");
+
+            // Mettre à jour startups.json
+            UpdateStartupsJson();
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"Failed to save startup to file: {ex.Message}");
         }
     }
+
 
 
     private string ExtractJsonContentFromResponse(string response)
@@ -527,10 +542,77 @@ private void LoadFounderImagePrompt()
     }
 
 
+    private void UpdateStartupsJson()
+    {
+        string startupsFilePath = Path.Combine(Application.streamingAssetsPath, "startups.json");
+        string generatedFolderPath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups");
+
+        // Liste pour stocker les noms des startups
+        List<string> startupNames = new List<string>();
+
+        // Vérifier si le dossier existe
+        if (Directory.Exists(generatedFolderPath))
+        {
+            // Parcourir tous les fichiers JSON dans le dossier
+            string[] jsonFiles = Directory.GetFiles(generatedFolderPath, "*.json");
+            foreach (string file in jsonFiles)
+            {
+                try
+                {
+                    // Lire le contenu du fichier
+                    string content = File.ReadAllText(file);
+
+                    // Extraire le nom de la startup
+                    string startupName = ExtractStartupNameFromJson(content);
+                    if (!string.IsNullOrEmpty(startupName))
+                    {
+                        startupNames.Add(ToCamelCase(startupName)); // Ajouter le nom à la liste en camelCase
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Unable to extract StartupName from file: {file}");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Error reading or parsing file {file}: {ex.Message}");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError($"Generated startups folder not found at: {generatedFolderPath}");
+            return;
+        }
+
+        // Construire l'objet StartupList
+        StartupList startupList = new StartupList { startups = startupNames };
+
+        // Sauvegarder le fichier startups.json
+        try
+        {
+            string updatedJson = JsonUtility.ToJson(startupList, true);
+            File.WriteAllText(startupsFilePath, updatedJson);
+            Debug.Log($"startups.json successfully rebuilt with {startupNames.Count} startups.");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to rebuild startups.json: {ex.Message}");
+        }
+    }
+
+
+
     // Classe temporaire pour extraire uniquement le StartupName
     [System.Serializable]
     private class StartupData
     {
         public string StartupName;
     }
+    [System.Serializable]
+    private class StartupList
+    {
+        public List<string> startups;
+    }
+
 }
