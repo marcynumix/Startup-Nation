@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Linq; 
 using System.Threading.Tasks;
 
 public class StartupGeneratorWindow : EditorWindow
@@ -11,12 +11,14 @@ public class StartupGeneratorWindow : EditorWindow
     private Vector2 scrollPosition; // Pour le défilement horizontal des mots-clés
     private string systemPrompt = ""; // Contenu du fichier de system prompt
     private string startupPrompt = ""; // Contenu du fichier de prompt
+    private string founderImagePrompt = ""; // Contenu du fichier de founder image prompt
     private bool showConfiguration = true; // État du groupe "Configuration"
     private bool showConfigurationData = true; // État du groupe "Configuration Data"
     private bool showGenerateStartups = true; // État du groupe "Generate Startups"
 
     private int numberOfStartups = 1; // Nombre de startups à générer
     private bool deleteOldData = false; // Supprimer les anciennes données (checkbox)
+    private bool generateImage = false; // Générer une image (checkbox)
 
     // Nouveaux paramètres OpenAI
     private string selectedModel = "gpt-3.5-turbo"; // Modèle OpenAI sélectionné
@@ -35,6 +37,7 @@ public class StartupGeneratorWindow : EditorWindow
         LoadKeywordFiles();
         LoadStartupPrompt();
         LoadSystemPrompt();
+        LoadFounderImagePrompt();
     }
 
     private void LoadKeywordFiles()
@@ -124,6 +127,38 @@ public class StartupGeneratorWindow : EditorWindow
         }
     }
 
+private void LoadFounderImagePrompt()
+    {
+        // Chemin vers le fichier de founder image prompt
+        string founderImagePromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/founder-image-prompt.txt");
+
+        if (File.Exists(founderImagePromptFilePath))
+        {
+            founderImagePrompt = File.ReadAllText(founderImagePromptFilePath); // Lire tout le fichier
+        }
+        else
+        {
+            Debug.LogError($"Founder image prompt file not found at: {founderImagePromptFilePath}");
+            founderImagePrompt = "Founder image prompt file not found!";
+        }
+    }
+
+    private void SaveFounderImagePrompt()
+    {
+        // Chemin vers le fichier de founder image prompt
+        string founderImagePromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/founder-image-prompt.txt");
+
+        try
+        {
+            File.WriteAllText(founderImagePromptFilePath, founderImagePrompt); // Sauvegarder le contenu dans le fichier
+            Debug.Log("Founder image prompt saved successfully.");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to save founder image prompt: {ex.Message}");
+        }
+    }
+
     private void OnGUI()
     {
         GUILayout.Label("Startup Generator", EditorStyles.boldLabel);
@@ -160,7 +195,7 @@ public class StartupGeneratorWindow : EditorWindow
             {
                 wordWrap = true // Active le retour à la ligne automatique
             };
-            systemPrompt = EditorGUILayout.TextArea(systemPrompt, textAreaStyle, GUILayout.Height(50));
+            systemPrompt = EditorGUILayout.TextArea(systemPrompt, textAreaStyle, GUILayout.Height(30));
 
             if (GUILayout.Button("Save System Prompt"))
             {
@@ -175,6 +210,16 @@ public class StartupGeneratorWindow : EditorWindow
             if (GUILayout.Button("Save Prompt"))
             {
                 SaveStartupPrompt(); // Sauvegarde du prompt
+            }
+
+            GUILayout.Space(10);
+            GUILayout.Label("Founder Image Prompt:", EditorStyles.label);
+
+            founderImagePrompt = EditorGUILayout.TextArea(founderImagePrompt, textAreaStyle, GUILayout.Height(50));
+
+            if (GUILayout.Button("Save Founder Image Prompt"))
+            {
+                SaveFounderImagePrompt(); // Sauvegarde du founder image prompt
             }
 
             GUILayout.Space(10);
@@ -220,8 +265,12 @@ public class StartupGeneratorWindow : EditorWindow
             numberOfStartups = EditorGUILayout.IntField(numberOfStartups, GUILayout.Width(50));
             EditorGUILayout.EndHorizontal();
 
+            // Checkbox pour générer des images
+            generateImage = EditorGUILayout.Toggle("Generate Image", generateImage);
+
             // Checkbox pour supprimer les anciennes données
             deleteOldData = EditorGUILayout.Toggle("Delete Old Data", deleteOldData);
+
 
             // Bouton pour générer les startups
             if (GUILayout.Button("Generate Startups"))
@@ -276,6 +325,12 @@ public class StartupGeneratorWindow : EditorWindow
                 {
                     SaveGeneratedStartupToFile(content); // Sauvegarder le contenu JSON dans un fichier
                     Debug.Log($"Startup #{i + 1} generated and saved. finalPrompt: {finalPrompt}");
+
+                    if (generateImage)
+                    {
+                        // Générer une image pour la startup
+                        await GenerateFounderImage(content);
+                    }
                 }
                 else
                 {
@@ -287,13 +342,59 @@ public class StartupGeneratorWindow : EditorWindow
                 Debug.LogError($"Error generating startup #{i + 1}: {ex.Message}");
             }
             Debug.Log("Attendre 5s entre chaque génération");
-            await Task.Delay(5000); // Attendre 1 seconde entre chaque génération
+            await Task.Delay(5000); // Attendre 5 secondes entre chaque génération
         }
 
         Debug.Log("Startup generation complete.");
     }
 
+    private async Task GenerateFounderImage(string jsonContent)
+    {
+        // Construire le prompt basé sur le contenu JSON
+        string prompt = founderImagePrompt.Replace("{json}", jsonContent);
 
+        try
+        {
+            Debug.Log("Generating founder image... prompt:" + prompt);
+            Texture2D image = await OpenAIClient.SendPromptImageAsync(prompt);
+
+            if (image != null)
+            {
+                // Extraire le nom de la startup depuis le JSON pour nommer le fichier
+                string startupName = ExtractStartupNameFromJson(jsonContent);
+
+                if (string.IsNullOrEmpty(startupName))
+                {
+                    Debug.LogError("Failed to extract 'StartupName' from the JSON content for founder image.");
+                    return;
+                }
+
+                string fileName = $"{ToCamelCase(startupName)}_founder.png";
+
+                // Chemin complet pour l'image
+                string generatedFolderPath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups");
+
+                if (!Directory.Exists(generatedFolderPath))
+                {
+                    Directory.CreateDirectory(generatedFolderPath);
+                }
+
+                string filePath = Path.Combine(generatedFolderPath, fileName);
+
+                // Sauvegarder l'image en PNG
+                File.WriteAllBytes(filePath, image.EncodeToPNG());
+                Debug.Log($"Founder image saved to: {filePath}");
+            }
+            else
+            {
+                Debug.LogError("Failed to generate founder image.");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Error generating founder image: {ex.Message}");
+        }
+    }
 
     /// <summary>
     /// Remplace les mots-clés entre accolades dans le prompt par des valeurs aléatoires des listes correspondantes.
@@ -363,7 +464,7 @@ public class StartupGeneratorWindow : EditorWindow
             // Extraire le contenu JSON depuis choices[0].message.content
             if (chatResponse != null && chatResponse.choices != null && chatResponse.choices.Length > 0)
             {
-                string jsonContent = chatResponse.choices[0].message.content.Replace("json","").Replace("```","");// Supprimer les balises de code
+                string jsonContent = chatResponse.choices[0].message.content.Replace("json","").Replace("```",""); // Supprimer les balises de code
                 return jsonContent;
             }
             else
@@ -384,8 +485,6 @@ public class StartupGeneratorWindow : EditorWindow
         try
         {
             // Désérialiser le JSON partiellement pour accéder uniquement au StartupName
-            // Debug.Log("JsonContent");
-            // Debug.Log(jsonContent);
             var startupData = JsonUtility.FromJson<StartupData>(jsonContent);
             return startupData?.StartupName ?? "";
         }
@@ -415,5 +514,4 @@ public class StartupGeneratorWindow : EditorWindow
     {
         public string StartupName;
     }
-
 }

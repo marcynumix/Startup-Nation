@@ -5,10 +5,10 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Unity.EditorCoroutines.Editor; // Nécessaire pour les coroutines dans l'éditeur
 
-
 public class OpenAIClient : MonoBehaviour
 {
     private static readonly string apiUrl = "https://api.openai.com/v1/chat/completions";
+    private static readonly string apiImageUrl = "https://api.openai.com/v1/images/generations"; // URL pour les images
     private static string apiKey;
 
     static OpenAIClient()
@@ -58,6 +58,99 @@ public class OpenAIClient : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Envoie un prompt à OpenAI pour générer une image et retourne la texture correspondante.
+    /// </summary>
+    /// <param name="prompt">Le prompt pour générer l'image.</param>
+    /// <returns>Une Texture2D représentant l'image générée.</returns>
+    public static async Task<Texture2D> SendPromptImageAsync(string prompt)
+    {
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            Debug.LogError("API Key is missing. Please check your .env file.");
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(prompt))
+        {
+            Debug.LogWarning("Prompt is empty. Please provide a valid prompt.");
+            return null;
+        }
+
+        return await Task.Run(() =>
+        {
+            var tcs = new TaskCompletionSource<Texture2D>();
+            EditorCoroutineUtility.StartCoroutineOwnerless(SendImageRequest(prompt, tcs));
+            return tcs.Task;
+        });
+    }
+
+    private static IEnumerator SendImageRequest(string prompt, TaskCompletionSource<Texture2D> tcs)
+    {
+        // Préparer les données de la requête
+        ImageRequest requestData = new ImageRequest
+        {
+            prompt = prompt,
+            n = 1,
+            size = "1024x1024"
+        };
+
+        string json = JsonUtility.ToJson(requestData);
+
+        using (UnityWebRequest request = new UnityWebRequest(apiImageUrl, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Authorization", "Bearer " + apiKey);
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string response = request.downloadHandler.text;
+                ImageResponse imageResponse = JsonUtility.FromJson<ImageResponse>(response);
+
+                if (imageResponse != null && imageResponse.data != null && imageResponse.data.Length > 0)
+                {
+                    string imageUrl = imageResponse.data[0].url;
+                    yield return DownloadImage(imageUrl, tcs);
+                }
+                else
+                {
+                    Debug.LogError("Image generation failed: No data returned.");
+                    tcs.SetResult(null);
+                }
+            }
+            else
+            {
+                string error = $"Error: {request.error}\nResponse Code: {request.responseCode}\nResponse Body: {request.downloadHandler.text}";
+                Debug.LogError(error);
+                tcs.SetResult(null);
+            }
+        }
+    }
+
+    private static IEnumerator DownloadImage(string imageUrl, TaskCompletionSource<Texture2D> tcs)
+    {
+        using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+                tcs.SetResult(texture);
+            }
+            else
+            {
+                Debug.LogError($"Failed to download image: {request.error}");
+                tcs.SetResult(null);
+            }
+        }
+    }
+
     private static IEnumerator SendRequest(string systemPrompt, string prompt, string model, int maxTokens, float temperature, TaskCompletionSource<string> tcs)
     {
         // Préparer les données de la requête
@@ -66,7 +159,7 @@ public class OpenAIClient : MonoBehaviour
             model = model,
             messages = new List<Message>
             {
-                new Message { role = "system", content = systemPrompt }, // Utiliser le system prompt personnalisé
+                new Message { role = "system", content = systemPrompt },
                 new Message { role = "user", content = prompt }
             },
             max_tokens = maxTokens,
@@ -97,7 +190,6 @@ public class OpenAIClient : MonoBehaviour
             }
         }
     }
-
 }
 
 // Classes de requête et réponse
@@ -127,4 +219,24 @@ public class ChatResponse
 public class Choice
 {
     public Message message;
+}
+
+[System.Serializable]
+public class ImageRequest
+{
+    public string prompt;
+    public int n;
+    public string size;
+}
+
+[System.Serializable]
+public class ImageResponse
+{
+    public ImageData[] data;
+}
+
+[System.Serializable]
+public class ImageData
+{
+    public string url;
 }

@@ -1,0 +1,1 @@
+Generate a modern, stylized, and cute 3D portrait of the founder of a startup. The details about the founder are provided in the following JSON format: {json}. Ensure the image captures a friendly and approachable personality with vibrant colors and smooth textures, reflecting a contemporary and creative style.
