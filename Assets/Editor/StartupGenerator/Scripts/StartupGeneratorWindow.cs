@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class StartupGeneratorWindow : EditorWindow
 {
@@ -259,26 +260,39 @@ public class StartupGeneratorWindow : EditorWindow
         // Générer les startups
         for (int i = 0; i < numberOfStartups; i++)
         {
+            Debug.Log($"Generating startup #{i + 1}...");
+
+            // Générer le prompt final avec des mots-clés
             string finalPrompt = GeneratePromptWithKeywords(startupPrompt);
 
-            // Appeler l'API OpenAI pour chaque startup générée
-            string response = await OpenAIClient.SendPromptAsync(systemPrompt, finalPrompt, selectedModel, maxTokens, temperature);
+            try
+            {
+                // Appeler l'API OpenAI pour chaque startup générée et attendre la réponse
+                string response = await OpenAIClient.SendPromptAsync(systemPrompt, finalPrompt, selectedModel, maxTokens, temperature);
 
-            // Parse la réponse pour extraire le contenu JSON
-            string content = ExtractJsonContentFromResponse(response);
-            Debug.Log($"Generated startup #{i + 1}" + (string.IsNullOrEmpty(content) ? " (Failed)" : ""));
-            if (!string.IsNullOrEmpty(content))
-            {
-                SaveGeneratedStartupToFile(content); // Sauvegarder le contenu JSON dans un fichier
+                // Parse la réponse pour extraire le contenu JSON
+                string content = ExtractJsonContentFromResponse(response);
+                if (!string.IsNullOrEmpty(content))
+                {
+                    SaveGeneratedStartupToFile(content); // Sauvegarder le contenu JSON dans un fichier
+                    Debug.Log($"Startup #{i + 1} generated and saved. finalPrompt: {finalPrompt}");
+                }
+                else
+                {
+                    Debug.LogError($"Failed to extract JSON content for startup #{i + 1}");
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                Debug.LogError($"Failed to extract JSON content for startup #{i + 1}");
+                Debug.LogError($"Error generating startup #{i + 1}: {ex.Message}");
             }
+            Debug.Log("Attendre 5s entre chaque génération");
+            await Task.Delay(5000); // Attendre 1 seconde entre chaque génération
         }
 
         Debug.Log("Startup generation complete.");
     }
+
 
 
     /// <summary>
@@ -349,7 +363,8 @@ public class StartupGeneratorWindow : EditorWindow
             // Extraire le contenu JSON depuis choices[0].message.content
             if (chatResponse != null && chatResponse.choices != null && chatResponse.choices.Length > 0)
             {
-                return chatResponse.choices[0].message.content;
+                string jsonContent = chatResponse.choices[0].message.content.Replace("json","").Replace("```","");// Supprimer les balises de code
+                return jsonContent;
             }
             else
             {
@@ -369,6 +384,8 @@ public class StartupGeneratorWindow : EditorWindow
         try
         {
             // Désérialiser le JSON partiellement pour accéder uniquement au StartupName
+            // Debug.Log("JsonContent");
+            // Debug.Log(jsonContent);
             var startupData = JsonUtility.FromJson<StartupData>(jsonContent);
             return startupData?.StartupName ?? "";
         }

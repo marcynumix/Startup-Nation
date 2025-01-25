@@ -1,9 +1,9 @@
-Génère une startup absurde sur la thématique "{thematics}" incluant la technologie "{technologies}" présentée par un fondateur {foundertraits} (un nom et 2 phrases maximum). Le taux de réussite de cette startup sera de {successrate}
-Ton retour sera au format json suivant :
+Génère une startup absurde sur la thématique "{thematics}" incluant la technologie "{technologies}" présentée par un fondateur ayant le foundertraits {foundertraits}. Le taux de réussite de cette startup sera de {successrate}
+Ton retour sera strictement au format json suivant :
 {
     "StartupName": "Nom de la startup", 
     "FounderName": "Nom du fondateur rigolo", 
-    "foundertrait":"foundertraits", 
+    "foundertrait":"foundertraits du fondateur", 
     "Pitch": "Pitch absurde en deux phrases maximum",
     "SuccessRate": 80
 }
