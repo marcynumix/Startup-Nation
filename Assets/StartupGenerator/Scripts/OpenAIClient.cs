@@ -1,63 +1,65 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using Unity.EditorCoroutines.Editor; // Nécessaire pour les coroutines dans l'éditeur
 
-public class OpenAIClient : MonoBehaviour
+public static class OpenAIClient
 {
-    // URL de l'API OpenAI
-    private string apiUrl = "https://api.openai.com/v1/chat/completions";
+    private static readonly string apiUrl = "https://api.openai.com/v1/chat/completions";
+    private static string apiKey;
 
-    // Clé API (chargée dynamiquement)
-    private string apiKey;
-
-    private void Start()
+    static OpenAIClient()
     {
-        // Charger la clé API depuis .env
+        // Charger la clé API depuis .env lors de la première utilisation
         EnvLoader.LoadEnv();
         apiKey = EnvLoader.GetEnv("OPENAI_API_KEY");
-        Debug.Log("API Key: " + apiKey);
 
         if (string.IsNullOrEmpty(apiKey))
         {
             Debug.LogError("API Key not found! Please check your .env file.");
         }
-
-        SendPrompt("Hello, how are you?");
-    }
-
-    // Méthode publique pour envoyer un message (appelable dans l'inspecteur)
-    public void SendPrompt(string prompt)
-    {
-        if (!string.IsNullOrEmpty(prompt))
-        {
-            Debug.Log("Sending prompt: " + prompt);
-            SendMessageToGPT(prompt);
-        }
         else
         {
-            Debug.LogWarning("Prompt is empty. Please enter a prompt.");
+            Debug.Log("API Key loaded successfully.");
         }
     }
 
-    private void SendMessageToGPT(string userPrompt)
+    /// <summary>
+    /// Envoie un prompt à OpenAI et retourne la réponse.
+    /// </summary>
+    /// <param name="prompt">Le prompt à envoyer.</param>
+    /// <returns>La réponse de l'API sous forme de texte.</returns>
+    public static async Task<string> SendPromptAsync(string prompt)
     {
-        if (!string.IsNullOrEmpty(apiKey))
+        if (string.IsNullOrEmpty(apiKey))
         {
-            StartCoroutine(SendRequest(userPrompt));
+            Debug.LogError("API Key is missing. Please check your .env file.");
+            return "Error: API Key is missing.";
         }
-        else
+
+        if (string.IsNullOrEmpty(prompt))
         {
-            Debug.LogError("Cannot send request: API Key is missing.");
+            Debug.LogWarning("Prompt is empty. Please provide a valid prompt.");
+            return "Error: Prompt cannot be empty.";
         }
+
+        // Envoyer la requête et attendre la réponse
+        return await Task.Run(() =>
+        {
+            var tcs = new TaskCompletionSource<string>();
+            EditorCoroutineUtility.StartCoroutineOwnerless(SendRequest(prompt, tcs));
+            return tcs.Task;
+        });
     }
 
-    private IEnumerator SendRequest(string prompt)
+    private static IEnumerator SendRequest(string prompt, TaskCompletionSource<string> tcs)
     {
-        // Création d'un objet requestData valide
+        // Préparer les données de la requête
         ChatRequest requestData = new ChatRequest
         {
-            model = "gpt-3.5-turbo", // Assurez-vous que votre compte supporte ce modèle
+            model = "gpt-3.5-turbo",
             messages = new List<Message>
             {
                 new Message { role = "system", content = "You are a helpful assistant." },
@@ -67,13 +69,11 @@ public class OpenAIClient : MonoBehaviour
             temperature = 0.7f
         };
 
-        // Conversion de l'objet en JSON
         string json = JsonUtility.ToJson(requestData);
 
         using (UnityWebRequest request = new UnityWebRequest(apiUrl, "POST"))
         {
             byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-
             request.uploadHandler = new UploadHandlerRaw(bodyRaw);
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
@@ -85,13 +85,15 @@ public class OpenAIClient : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("Response: " + request.downloadHandler.text);
+                string response = request.downloadHandler.text;
+                Debug.Log("Response: " + response);
+                tcs.SetResult(response); // Renvoie la réponse au Task
             }
             else
             {
-                Debug.LogError($"Error: {request.error}");
-                Debug.LogError($"Response Code: {request.responseCode}");
-                Debug.LogError($"Response Body: {request.downloadHandler.text}");
+                string error = $"Error: {request.error}\nResponse Code: {request.responseCode}\nResponse Body: {request.downloadHandler.text}";
+                Debug.LogError(error);
+                tcs.SetResult(error); // Renvoie l'erreur au Task
             }
         }
     }

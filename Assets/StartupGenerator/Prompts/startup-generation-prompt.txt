@@ -1,0 +1,1 @@
+Propose un pitch de startup absurde sur la thématique "{thematics}" incluant la technologie "{technologies}" présentée par un fondateur honnête et incompétent (un nom et 3 phrases maximum)
