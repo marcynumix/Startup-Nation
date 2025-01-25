@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 public class StartupGeneratorWindow : EditorWindow
 {
@@ -40,7 +41,7 @@ public class StartupGeneratorWindow : EditorWindow
         keywordLists.Clear();
 
         // Chemin vers le dossier Data
-        string dataFolderPath = Path.Combine(Application.dataPath, "StartupGenerator/Data");
+        string dataFolderPath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Data");
 
         if (Directory.Exists(dataFolderPath))
         {
@@ -61,7 +62,7 @@ public class StartupGeneratorWindow : EditorWindow
     private void LoadSystemPrompt()
     {
         // Chemin vers le fichier de system prompt
-        string systemPromptFilePath = Path.Combine(Application.dataPath, "StartupGenerator/Prompts/startup-generation-systemprompt.txt");
+        string systemPromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/startup-generation-systemprompt.txt");
 
         if (File.Exists(systemPromptFilePath))
         {
@@ -77,7 +78,7 @@ public class StartupGeneratorWindow : EditorWindow
     private void SaveSystemPrompt()
     {
         // Chemin vers le fichier de system prompt
-        string systemPromptFilePath = Path.Combine(Application.dataPath, "StartupGenerator/Prompts/startup-generation-systemprompt.txt");
+        string systemPromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/startup-generation-systemprompt.txt");
 
         try
         {
@@ -93,7 +94,7 @@ public class StartupGeneratorWindow : EditorWindow
     private void LoadStartupPrompt()
     {
         // Chemin vers le fichier de prompt
-        string promptFilePath = Path.Combine(Application.dataPath, "StartupGenerator/Prompts/startup-generation-prompt.txt");
+        string promptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/startup-generation-prompt.txt");
 
         if (File.Exists(promptFilePath))
         {
@@ -109,7 +110,7 @@ public class StartupGeneratorWindow : EditorWindow
     private void SaveStartupPrompt()
     {
         // Chemin vers le fichier de prompt
-        string promptFilePath = Path.Combine(Application.dataPath, "StartupGenerator/Prompts/startup-generation-prompt.txt");
+        string promptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/startup-generation-prompt.txt");
 
         try
         {
@@ -247,8 +248,12 @@ public class StartupGeneratorWindow : EditorWindow
         // Supprimer les anciennes données si nécessaire
         if (deleteOldData)
         {
-            Debug.Log("Old data deleted.");
-            // Logique pour supprimer les anciennes données (si applicable)
+            string generatedFolderPath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups");
+            if (Directory.Exists(generatedFolderPath))
+            {
+                Directory.Delete(generatedFolderPath, true); // Supprime tout le dossier
+                Debug.Log("Old generated startups deleted.");
+            }
         }
 
         // Générer les startups
@@ -256,15 +261,25 @@ public class StartupGeneratorWindow : EditorWindow
         {
             string finalPrompt = GeneratePromptWithKeywords(startupPrompt);
 
-            // Appeler l'API OpenAI pour chaque startup générée avec les paramètres personnalisés
+            // Appeler l'API OpenAI pour chaque startup générée
             string response = await OpenAIClient.SendPromptAsync(systemPrompt, finalPrompt, selectedModel, maxTokens, temperature);
 
-            // Afficher le résultat dans la console
-            Debug.Log($"Generated Startup #{i + 1}: {response}");
+            // Parse la réponse pour extraire le contenu JSON
+            string content = ExtractJsonContentFromResponse(response);
+            Debug.Log($"Generated startup #{i + 1}" + (string.IsNullOrEmpty(content) ? " (Failed)" : ""));
+            if (!string.IsNullOrEmpty(content))
+            {
+                SaveGeneratedStartupToFile(content); // Sauvegarder le contenu JSON dans un fichier
+            }
+            else
+            {
+                Debug.LogError($"Failed to extract JSON content for startup #{i + 1}");
+            }
         }
 
         Debug.Log("Startup generation complete.");
     }
+
 
     /// <summary>
     /// Remplace les mots-clés entre accolades dans le prompt par des valeurs aléatoires des listes correspondantes.
@@ -286,4 +301,102 @@ public class StartupGeneratorWindow : EditorWindow
 
         return prompt;
     }
+
+    private void SaveGeneratedStartupToFile(string content)
+    {
+        // Extraire le champ "StartupName" depuis le JSON
+        string startupName = ExtractStartupNameFromJson(content);
+
+        if (string.IsNullOrEmpty(startupName))
+        {
+            Debug.LogError("Failed to extract 'StartupName' from the JSON content.");
+            return;
+        }
+
+        // Convertir le nom en camelCase et supprimer les espaces
+        string fileName = $"{ToCamelCase(startupName)}.json";
+
+        // Chemin complet pour le fichier
+        string generatedFolderPath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups");
+
+        if (!Directory.Exists(generatedFolderPath))
+        {
+            Directory.CreateDirectory(generatedFolderPath);
+            Debug.Log($"Created directory: {generatedFolderPath}");
+        }
+
+        string filePath = Path.Combine(generatedFolderPath, fileName);
+
+        try
+        {
+            File.WriteAllText(filePath, content); // Écraser le fichier existant
+            Debug.Log($"Startup saved to: {filePath}");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to save startup to file: {ex.Message}");
+        }
+    }
+
+
+    private string ExtractJsonContentFromResponse(string response)
+    {
+        try
+        {
+            // Désérialiser la réponse dans un objet ChatResponse
+            ChatResponse chatResponse = JsonUtility.FromJson<ChatResponse>(response);
+
+            // Extraire le contenu JSON depuis choices[0].message.content
+            if (chatResponse != null && chatResponse.choices != null && chatResponse.choices.Length > 0)
+            {
+                return chatResponse.choices[0].message.content;
+            }
+            else
+            {
+                Debug.LogError("Invalid response format: choices array is empty or null.");
+                return null;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to parse response JSON: {ex.Message}");
+            return null;
+        }
+    }
+
+    private string ExtractStartupNameFromJson(string jsonContent)
+    {
+        try
+        {
+            // Désérialiser le JSON partiellement pour accéder uniquement au StartupName
+            var startupData = JsonUtility.FromJson<StartupData>(jsonContent);
+            return startupData?.StartupName ?? "";
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to extract 'StartupName' from JSON: {ex.Message}");
+            return null;
+        }
+    }
+
+    private string ToCamelCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return "";
+
+        // Supprimer les espaces et capitaliser chaque mot
+        string[] words = input.Split(' ', '-', '_');
+        string camelCase = string.Join("", words.Select(w => char.ToUpperInvariant(w[0]) + w.Substring(1).ToLowerInvariant()));
+
+        // Retourner le résultat avec la première lettre en minuscule
+        return char.ToLowerInvariant(camelCase[0]) + camelCase.Substring(1);
+    }
+
+
+    // Classe temporaire pour extraire uniquement le StartupName
+    [System.Serializable]
+    private class StartupData
+    {
+        public string StartupName;
+    }
+
 }

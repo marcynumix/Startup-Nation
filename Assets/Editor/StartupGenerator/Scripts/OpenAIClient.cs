@@ -5,7 +5,8 @@ using UnityEngine;
 using UnityEngine.Networking;
 using Unity.EditorCoroutines.Editor; // Nécessaire pour les coroutines dans l'éditeur
 
-public static class OpenAIClient
+
+public class OpenAIClient : MonoBehaviour
 {
     private static readonly string apiUrl = "https://api.openai.com/v1/chat/completions";
     private static string apiKey;
