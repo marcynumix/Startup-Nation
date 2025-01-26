@@ -13,6 +13,8 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public Image swipeBackgroundImage;
     public Color swipeBackgroundColor1;
     public Color swipeBackgroundColor2;
+    public feedbackUI feedbackUI;
+
     
     [Header("Positions de référence")]
     public RectTransform swipeLeftRef;
@@ -94,6 +96,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeRightRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             swipeDirection=1;
+            feedbackUI.ToggleFeedback(false, swipeDirection==1, true);
         }
         else if (dragDelta.x < -centerTreshold)
         {
@@ -101,6 +104,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeLeftRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             swipeDirection=-1;
+            feedbackUI.ToggleFeedback(false, swipeDirection==1, true);
 
         }
         else
@@ -108,6 +112,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeMiddleRef;
             p = 1;
             swipeDirection=0;
+            feedbackUI.ToggleFeedback(true, swipeDirection==1, false);
         }
         targetPosition = Vector2.Lerp(initialElementPosition, target.anchoredPosition, p);
         targetRotation = Quaternion.Lerp(swipeableElement.rotation, target.rotation, p);
