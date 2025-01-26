@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "Plantes Qui Chantent",
+    "FounderName": "Aurélie Verdure",
+    "FounderTraits": "compétente et honnête",
+    "FounderSex": "femme",
+    "FounderExperience": "Ancienne ingénieure agricole avec 10 ans d'expérience dans la gestion des écosystèmes durables",
+    "Pitch": "Nous avons créé des plantes qui chantent pour indiquer leur besoin en eau. C'est la révolution pour ceux qui oublient d'arroser leurs plantes. Écoutez votre jardin s'exprimer et devenez un expert du jardinage sans effort!",
+    "Place": "garage transformé en laboratoire de biotechnologie",
+    "SuccessRate": 0.7,
+    "ROI": 0.8,
+    "ImagePrompt": "A singing plant in a pot, detailed, high quality, vibrant colors, realistic",
+    "VocalPrompt": "A confident and clear female voice, warm and enthusiastic tone, conveying trust and competence"
+}

@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "CryptoChatCoin",
+    "FounderName": "Jean-Michel Dubois",
+    "FounderTraits": "compétent et malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien analyste financier chez une grande banque d'investissement",
+    "Pitch": "CryptoChatCoin révolutionne la communication en permettant des transactions instantanées via vos messages. Envoyez des fonds tout en discutant avec vos amis, le tout sécurisé par blockchain. Rejoignez la nouvelle vague de la communication financière !",
+    "Place": "garage transformé en bureau high-tech",
+    "SuccessRate": 0.4,
+    "ROI": 0.6,
+    "ImagePrompt": "A sleek, modern digital wallet interface on a smartphone, displaying a chat conversation with integrated cryptocurrency transactions, futuristic design, high-quality graphics",
+    "VocalPrompt": "A confident and persuasive male voice with a slight hint of charm, mid-30s, speaking with enthusiasm and authority"
+}

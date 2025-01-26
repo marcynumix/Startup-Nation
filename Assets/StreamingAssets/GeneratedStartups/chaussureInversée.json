@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "Chaussure Inversée",
+    "FounderName": "Marcel Dupont",
+    "FounderTraits": "compétent et honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien ingénieur en matériaux composites chez Decathlon",
+    "Pitch": "Découvrez la Chaussure Inversée, la première chaussure qui se porte à l'envers pour une expérience de marche révolutionnaire ! Grâce à l'Additive Manufacturing, nous imprimons des semelles qui stimulent vos pieds de manière innovante. Rejoignez le mouvement et marchez différemment !",
+    "Place": "garage de son oncle",
+    "SuccessRate": 0.6,
+    "ROI": 0.8,
+    "ImagePrompt": "a quirky, oddly-shaped shoe that looks like it's meant to be worn upside down, detailed textures and vibrant colors, in a garage setting",
+    "VocalPrompt": "a confident and clear male voice with a hint of excitement, conveying honesty and passion"
+}

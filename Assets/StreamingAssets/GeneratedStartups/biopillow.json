@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "BioPillow",
+    "FounderName": "Charles Dupont",
+    "FounderTraits": "Incompétent et vaguement malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "Ancien vendeur de matelas",
+    "Pitch": "Transformez votre sommeil avec BioPillow, l'oreiller qui prétend s'adapter à votre ADN pour un confort personnalisé. Vous ne vous êtes jamais senti aussi bien reposé. Ou peut-être pas.",
+    "Place": "garage de sa tante",
+    "SuccessRate": 0.2,
+    "ROI": 0.3,
+    "ImagePrompt": "a futuristic pillow with DNA helix pattern, poorly sewn, in a cluttered garage",
+    "VocalPrompt": "a confident yet slightly unsure male voice with a hint of exaggeration"
+}

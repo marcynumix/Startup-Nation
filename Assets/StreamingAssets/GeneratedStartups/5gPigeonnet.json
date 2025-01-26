@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "5G PigeonNet",
+    "FounderName": "Marcel Dupin",
+    "FounderTraits": "compétent et malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien ingénieur en télécommunications chez une grande entreprise",
+    "Pitch": "Imaginez un monde où les pigeons servent de relais 5G. Avec PigeonNet, nous utilisons la nature pour déployer la technologie du futur.",
+    "Place": "garage transformé en laboratoire high-tech",
+    "SuccessRate": 0.4,
+    "ROI": 0.1,
+    "ImagePrompt": "A futuristic gadget attached to a pigeon, blending nature and technology, with sleek design and vibrant colors.",
+    "VocalPrompt": "A confident and persuasive male voice with a hint of charm and mischief."
+}

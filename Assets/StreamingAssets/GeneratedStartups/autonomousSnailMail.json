@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "Autonomous Snail Mail",
+    "FounderName": "Jean-Pierre Boulanger",
+    "FounderTraits": "compétent et honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien ingénieur en robotique chez un constructeur automobile",
+    "Pitch": "Avec Autonomous Snail Mail, nous réinventons la livraison de courrier grâce à des véhicules autonomes ultra-lents. Imaginez des robots qui prennent leur temps, pour s'assurer que chaque lettre arrive en toute sécurité. Moins de vitesse, plus de fiabilité !",
+    "Place": "garage de son oncle",
+    "SuccessRate": 0.6,
+    "ROI": 0.8,
+    "ImagePrompt": "A whimsical autonomous vehicle designed to look like a giant snail, with wheels and a small delivery compartment, set in a garage environment with tools and robotic parts scattered around.",
+    "VocalPrompt": "A warm and reassuring male voice with a hint of humor and sincerity, conveying trustworthiness and competence."
+}

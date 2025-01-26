@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "5Gullible",
+    "FounderName": "Jean-Luc Deceptif",
+    "FounderTraits": "compétent et malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien ingénieur en télécommunications dans une grande entreprise",
+    "Pitch": "Avec 5Gullible, transformez chaque mouvement en une donnée monétisable grâce à la puissance de la 5G. Notre technologie révolutionnaire vous permet de gagner de l'argent en marchant. Ne laissez plus vos pas être perdus dans le vide!",
+    "Place": "garage transformé en bureau high-tech",
+    "SuccessRate": 0.4,
+    "ROI": 0.2,
+    "ImagePrompt": "A futuristic sneaker with embedded 5G technology, glowing with neon lights, surrounded by digital data streams, in a high-tech setting.",
+    "VocalPrompt": "A confident and persuasive French male voice, with a slight undertone of charm and cunning"
+}

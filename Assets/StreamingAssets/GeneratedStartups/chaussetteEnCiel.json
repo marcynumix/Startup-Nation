@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "Chaussette en Ciel",
+    "FounderName": "Clémentine Tricot",
+    "FounderTraits": "compétente et honnête",
+    "FounderSex": "femme",
+    "FounderExperience": "Diplômée en ingénierie mécanique avec 10 ans d'expérience dans l'industrie textile",
+    "Pitch": "Nous fabriquons des chaussettes personnalisées en utilisant l'impression 3D pour des pieds heureux et stylés.",
+    "Place": "son garage transformé en atelier",
+    "SuccessRate": 0.7,
+    "ROI": 0.9,
+    "ImagePrompt": "A high-quality, brightly colored 3D-printed sock with intricate patterns, set against a background of a modern workshop.",
+    "VocalPrompt": "A clear and confident female voice with a touch of warmth and enthusiasm."
+}

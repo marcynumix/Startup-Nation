@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "GridGizmo",
+    "FounderName": "Léo Dupont",
+    "FounderTraits": "incompétent et légèrement malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien stagiaire en communication chez une petite agence de pub",
+    "Pitch": "Chez GridGizmo, nous révolutionnons les Smart Grids avec notre technologie brevetée qui augmente la puissance électrique par simple pression d'un bouton. Pourquoi se contenter de l'ancien réseau quand vous pouvez avoir un réseau intelligent sans effort ? Rejoignez-nous pour un avenir électrisant !",
+    "Place": "garage de ses parents",
+    "SuccessRate": 0.2,
+    "ROI": 0.1,
+    "ImagePrompt": "a poorly designed smart grid device with colorful buttons, set in a cluttered garage, low quality",
+    "VocalPrompt": "a young male voice with a confident yet slightly unsure tone, trying to sound knowledgeable"
+}

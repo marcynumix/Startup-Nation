@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "IoTChatouille",
+    "FounderName": "Léonard Dupont",
+    "FounderTraits": "Incompétent et honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "Ancien étudiant en histoire de l'art reconverti en tech",
+    "Pitch": "Chez IoTChatouille, nous avons inventé le premier coussin connecté qui vous chatouille pour vous réveiller. Je ne suis pas sûr que ça marche, mais ça a l'air amusant. Et puis, pourquoi pas essayer?",
+    "Place": "garage de ses parents",
+    "SuccessRate": 0.3,
+    "ROI": 0.7,
+    "ImagePrompt": "A slightly poorly designed smart cushion with various electronic components, wires sticking out, and a whimsical design resembling a tickling device, placed in a cluttered garage setting.",
+    "VocalPrompt": "A warm and somewhat unsure male voice with a hint of enthusiasm and honesty, expressing a novel yet slightly silly idea."
+}

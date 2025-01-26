@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "BioMoustache",
+    "FounderName": "Jean-Charles Dupin",
+    "FounderTraits": "incompétent, légèrement malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien responsable de rayon dans un magasin bio",
+    "Pitch": "Chez BioMoustache, nous cultivons des moustaches biologiques pour une planète plus verte. Grâce à notre technologie unique, soyez à la mode tout en sauvant les arbres. Rejoignez le mouvement de la moustache écolo!",
+    "Place": "garage de son cousin",
+    "SuccessRate": 0.3,
+    "ROI": 0.2,
+    "ImagePrompt": "a poorly designed product showing a plant growing in the shape of a mustache, with vibrant green colors but questionable quality",
+    "VocalPrompt": "A confident yet slightly nervous male voice with a hint of over-excitement, trying to sound professional"
+}
