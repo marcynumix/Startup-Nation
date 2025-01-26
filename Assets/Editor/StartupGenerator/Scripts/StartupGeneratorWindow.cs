@@ -374,8 +374,6 @@ public class StartupGeneratorWindow : EditorWindow
             {
                 Debug.LogError($"Error generating startup #{i + 1}: {ex.Message}");
             }
-            Debug.Log("Attendre 5s entre chaque génération");
-            await Task.Delay(5000); // Attendre 5 secondes entre chaque génération
         }
 
         Debug.Log("Startup generation complete.");
@@ -429,7 +427,7 @@ public class StartupGeneratorWindow : EditorWindow
             }
             else
             {
-                string style = ", Kawaii futuristic UI design, pastel color palette, retro 90s aesthetics, cyber minimalism, cute tech interface, cartoonish elements, soft grid background, neon glow accents, stylized 2D character, high-tech gadget with friendly expressions, sci-fi meets cute design";
+                string style = "Kawaii futuristic UI design, pastel color palette, retro 90s aesthetics, cyber minimalism, cute tech interface, cartoonish elements, soft grid background, neon glow accents, stylized 2D character, high-tech gadget with friendly expressions, sci-fi meets cute design";
                 string exePath = @"Assets\Resources\main.exe";  // Ensure correct path
                 string arguments = $"\"192.168.1.72:8188\" \"{prompt}{style}\"";  // Include quotes for parameters with spaces
 
