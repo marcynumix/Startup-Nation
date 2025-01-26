@@ -429,8 +429,9 @@ public class StartupGeneratorWindow : EditorWindow
             }
             else
             {
+                string style = ", Kawaii futuristic UI design, pastel color palette, retro 90s aesthetics, cyber minimalism, cute tech interface, cartoonish elements, soft grid background, neon glow accents, stylized 2D character, high-tech gadget with friendly expressions, sci-fi meets cute design";
                 string exePath = @"Assets\Resources\main.exe";  // Ensure correct path
-                string arguments = $"\"192.168.1.72:8188\" \"{prompt}\"";  // Include quotes for parameters with spaces
+                string arguments = $"\"192.168.1.72:8188\" \"{prompt}{style}\"";  // Include quotes for parameters with spaces
 
                 RunProcess(exePath, arguments);
 
