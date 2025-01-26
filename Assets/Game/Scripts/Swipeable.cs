@@ -13,8 +13,9 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public RectTransform swipeableElement;
     public CanvasGroup swipeableCanvasGroup;
 
+    public RectTransform startupCard;
     public RectTransform gameoverCard;
-    public CanvasGroup gameoverCanvasGroup;
+
 
     public RectTransform swipeBackFaceCard;
     public Image swipeBackgroundImage;
@@ -48,10 +49,14 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public AudioSource audioSourceBuyFeedback;
     public AudioSource audioSourceFlip;
+    public AudioSource audioSourceFX;
     public AudioClip[] buySoundsPositive;
     public AudioClip[] buySoundsnegative;
     public AudioClip[] flipSounds;
     public AudioClip[] refusalSounds;
+    public AudioClip[] gameOverSounds;
+    public AudioClip[] newGameSounds;
+    public AudioClip[] winMoneySounds;
 
     public InvestFeedbackSO[] investFeedbacks;
 
@@ -80,7 +85,12 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         targetRotation = swipeableElement.rotation;
 
         swipeableElement.gameObject.SetActive(true);
+        startupCard.gameObject.SetActive(true);
         gameoverCard.gameObject.SetActive(false);
+    }
+
+    void Start(){
+        PlayRandomSound(newGameSounds, audioSourceFX);
     }
 
     private void Update()
@@ -96,7 +106,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if(isAnimating || Player.instance.isGameOver)
+        if(isAnimating)
             return;
 
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out startPointerPosition))
@@ -108,7 +118,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnDrag(PointerEventData eventData)
     {
-        if(isAnimating || Player.instance.isGameOver)
+        if(isAnimating)
             return;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out currentPointerPosition))
             return;
@@ -195,7 +205,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if(isAnimating || Player.instance.isGameOver)
+        if(isAnimating)
             return;
         isDragging = false;
 
@@ -209,34 +219,50 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     }
 
     private IEnumerator ValidateSwipeCoroutine()
-    {
+    {     
+        bool gameRestarting = Player.instance.isGameOver;
+        if(gameRestarting){
+            Player.instance.isGameOver=false;
+            Player.instance.Money = Player.instance.startMoney;
+            
+            PlayRandomSound(newGameSounds, audioSourceFX);
+            
+        }
         
-        
+
         isAnimating = true;
 
         bool isBuy = swipeDirection == 1;
 
+        if(!gameRestarting){
+            if(isBuy){
+                
 
-        if(isBuy){
-            
+                // Decide if win or lose money
+                StartupData startup = StartupInvestCard.Instance.currentStartup;
+                float successRate = startup.SuccessRate;
 
-            // Decide if win or lose money
-            StartupData startup = StartupInvestCard.Instance.currentStartup;
-            float successRate = startup.SuccessRate;
+                bool win = UnityEngine.Random.value < successRate;
+                int sign = win ? 1 : -1;
+                Player.instance.Money += sign*Player.instance.MoneyBid;
 
-            bool win = UnityEngine.Random.value < successRate;
-            int sign = win ? 1 : -1;
-            Player.instance.Money += sign*Player.instance.MoneyBid;
+                
+                if(win){
+                    PlayRandomSound(buySoundsPositive, audioSourceBuyFeedback);
+                    PlayRandomSound(winMoneySounds, audioSourceFX);
+                }
+                else {
+                    PlayRandomSound(buySoundsnegative, audioSourceBuyFeedback);
+                }
+            }
+            else {
+                // Player.instance.Money += 100000;
+                StartupInvestCard.Instance.MutePitch();
+            }
 
-            PlayRandomSound(win?buySoundsPositive:buySoundsnegative, audioSourceBuyFeedback);
-        }
-        else {
-            // Player.instance.Money += 100000;
-            StartupInvestCard.Instance.MutePitch();
-        }
-
-        if(!isBuy){
-            PlayRandomSound(refusalSounds, audioSourceBuyFeedback);
+            if(!isBuy){
+                PlayRandomSound(refusalSounds, audioSourceBuyFeedback);
+            }
         }
             
 
@@ -270,12 +296,14 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         
         
         if(Player.instance.Money>0){
-            yield return StartCoroutine(FlipNewCardCoroutine());
+            
         }
         else {
             Player.instance.isGameOver = true;
-            yield return StartCoroutine(FlipGameOverCardCoroutine());
+            
         }
+        yield return StartCoroutine(FlipNewCardCoroutine());
+
         isAnimating = false;
     }
 
@@ -283,6 +311,11 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         StartCoroutine(FlipNewCardCoroutine());
     }
     public IEnumerator FlipNewCardCoroutine(){
+            startupCard.gameObject.SetActive(!Player.instance.isGameOver);
+            gameoverCard.gameObject.SetActive(Player.instance.isGameOver);
+            if(Player.instance.isGameOver){
+                PlayRandomSound(gameOverSounds, audioSourceFX);
+            }
             // Animate back face card towards 90°
             swipeBackgroundImage.color = swipeBackgroundColor2;
             float t2 = 0;
@@ -311,7 +344,9 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 yield return null;
             }
             swipeBackgroundImage.color = swipeBackgroundColor1;
-            StartupInvestCard.Instance.PlayPitch(0);
+            if(!Player.instance.isGameOver){
+                StartupInvestCard.Instance.PlayPitch(0);
+            }
     }
 
     public void RestartGame(){
@@ -333,43 +368,6 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     }
 
-    public void flipGameOverCard(){
-        StartCoroutine(FlipGameOverCardCoroutine());
-    }
-    private IEnumerator FlipGameOverCardCoroutine(){
-            // Animate back face card towards 90°
-            swipeBackgroundImage.color = swipeBackgroundColor2;
-            float t2 = 0;
-            float p=0;
-            while (t2 < flipDuration)
-            {
-                t2 += Time.deltaTime;
-                p = t2 / flipDuration;
-                swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
-                yield return null;
-            }
-
-            feedbackUI.ResetPositions();
-            PlayRandomSound(flipSounds, audioSourceFlip);
-
-            // Animate SwipeElement card towards 0°
-            gameoverCard.gameObject.SetActive(true);
-            gameoverCard.anchoredPosition = swipeMiddleRef.anchoredPosition;
-            gameoverCard.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
-            gameoverCanvasGroup.alpha = 1;
-            t2 = 0;
-            p=0;
-            while (t2 < flipDuration)
-            {
-                t2 += Time.deltaTime;
-                p = t2 / flipDuration;
-                gameoverCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 90, 0)), Quaternion.Euler(new Vector3(0, 0, 0)), validationAnimationCurve.Evaluate(p));
-                yield return null;
-            }
-            swipeBackgroundImage.color = swipeBackgroundColor1;
-
-
-    }
 
 
     public void SetInvestFeedback(int positiveness){

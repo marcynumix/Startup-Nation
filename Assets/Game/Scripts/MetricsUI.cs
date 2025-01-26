@@ -1,5 +1,3 @@
-using NUnit.Framework;
-using Unity.Android.Gradle;
 using UnityEngine;
 
 public class MetricsUI : MonoBehaviour
