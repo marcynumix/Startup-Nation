@@ -110,6 +110,9 @@ public class StartupInvestCard : MonoBehaviour
         // Convertir les données JSON
         StartupData startup = JsonUtility.FromJson<StartupData>(jsonRequest.downloadHandler.text);
 
+        // MAJ Metrics UI
+        MetricsUI.instance.SetMetrics(startup.SuccessRate);
+
         // Mettre à jour les champs de l'UI
         startupName.text = startup.StartupName;
         founderName.text = founderNameShadow.text = startup.FounderName;
@@ -197,6 +200,7 @@ public class StartupInvestCard : MonoBehaviour
         public string FounderName;
         public string foundertrait;
         public string Pitch;
-        public int SuccessRate;
+        public float SuccessRate;
+        public string FounderSex;
     }
 }
