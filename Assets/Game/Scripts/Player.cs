@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+
     public static Player instance;
+    public bool isGameOver = false;
     public int startMoney = 1000000;   
 
     private int money = 1000000;

@@ -5,11 +5,17 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.AI;
 using System.Globalization;
+using NUnit.Framework.Constraints;
 
 public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
+    public static Swipeable instance;
     public RectTransform swipeableElement;
     public CanvasGroup swipeableCanvasGroup;
+
+    public RectTransform gameoverCard;
+    public CanvasGroup gameoverCanvasGroup;
+
     public RectTransform swipeBackFaceCard;
     public Image swipeBackgroundImage;
     public Color swipeBackgroundColor1;
@@ -68,11 +74,13 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     private void Awake()
     {
+        instance=this;
         rectTransform = GetComponent<RectTransform>();
         targetPosition = swipeableElement.anchoredPosition;
         targetRotation = swipeableElement.rotation;
 
         swipeableElement.gameObject.SetActive(true);
+        gameoverCard.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -88,7 +96,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if(isAnimating)
+        if(isAnimating || Player.instance.isGameOver)
             return;
 
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out startPointerPosition))
@@ -100,7 +108,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnDrag(PointerEventData eventData)
     {
-        if(isAnimating)
+        if(isAnimating || Player.instance.isGameOver)
             return;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out currentPointerPosition))
             return;
@@ -187,16 +195,20 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        if(isAnimating)
+        if(isAnimating || Player.instance.isGameOver)
             return;
         isDragging = false;
 
         if(swipeDirection!=0){
-            StartCoroutine(ValidateSwipe());
+            StartCoroutine(ValidateSwipeCoroutine());
         }
     }
 
-    private IEnumerator ValidateSwipe()
+    public void Swipe(){
+        StartCoroutine(ValidateSwipeCoroutine());
+    }
+
+    private IEnumerator ValidateSwipeCoroutine()
     {
         
         
@@ -256,24 +268,41 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         swipeBackFaceCard.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
         
-        // Animate back face card towards 90°
-        swipeBackgroundImage.color = swipeBackgroundColor2;
-        float t2 = 0;
-        while (t2 < flipDuration)
-        {
-            t2 += Time.deltaTime;
-            p = t2 / flipDuration;
-            swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
-            yield return null;
-        }
-        feedbackUI.ResetPositions();
-        PlayRandomSound(flipSounds, audioSourceFlip);
+        
         if(Player.instance.Money>0){
+            yield return StartCoroutine(FlipNewCardCoroutine());
+        }
+        else {
+            Player.instance.isGameOver = true;
+            yield return StartCoroutine(FlipGameOverCardCoroutine());
+        }
+        isAnimating = false;
+    }
+
+    public void FlipNewCard(){
+        StartCoroutine(FlipNewCardCoroutine());
+    }
+    public IEnumerator FlipNewCardCoroutine(){
+            // Animate back face card towards 90°
+            swipeBackgroundImage.color = swipeBackgroundColor2;
+            float t2 = 0;
+            float p=0;
+            while (t2 < flipDuration)
+            {
+                t2 += Time.deltaTime;
+                p = t2 / flipDuration;
+                swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
+                yield return null;
+            }
+            feedbackUI.ResetPositions();
+            PlayRandomSound(flipSounds, audioSourceFlip);
             // Animate SwipeElement card towards 0°
+            swipeableElement.gameObject.SetActive(true);
             swipeableElement.anchoredPosition = swipeMiddleRef.anchoredPosition;
             swipeableElement.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
             swipeableCanvasGroup.alpha = 1;
             t2 = 0;
+            p=0;
             while (t2 < flipDuration)
             {
                 t2 += Time.deltaTime;
@@ -282,12 +311,66 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
                 yield return null;
             }
             swipeBackgroundImage.color = swipeBackgroundColor1;
-            StartupInvestCard.Instance.PlayPitch(1);
-        }        
-        isAnimating = false;
+            StartupInvestCard.Instance.PlayPitch(0);
     }
 
-    
+    public void RestartGame(){
+        StartCoroutine(RestartGameCoroutine());
+    }
+    private IEnumerator RestartGameCoroutine(){
+        swipeBackgroundImage.color = swipeBackgroundColor1;
+        // Animate gameover card towards 90°
+        float t2 = 0;
+        float p=0;
+        while (t2 < flipDuration)
+        {
+            t2 += Time.deltaTime;
+            p = t2 / flipDuration;
+            gameoverCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
+            yield return null;
+        }
+        yield return StartCoroutine(FlipNewCardCoroutine());
+
+    }
+
+    public void flipGameOverCard(){
+        StartCoroutine(FlipGameOverCardCoroutine());
+    }
+    private IEnumerator FlipGameOverCardCoroutine(){
+            // Animate back face card towards 90°
+            swipeBackgroundImage.color = swipeBackgroundColor2;
+            float t2 = 0;
+            float p=0;
+            while (t2 < flipDuration)
+            {
+                t2 += Time.deltaTime;
+                p = t2 / flipDuration;
+                swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
+                yield return null;
+            }
+
+            feedbackUI.ResetPositions();
+            PlayRandomSound(flipSounds, audioSourceFlip);
+
+            // Animate SwipeElement card towards 0°
+            gameoverCard.gameObject.SetActive(true);
+            gameoverCard.anchoredPosition = swipeMiddleRef.anchoredPosition;
+            gameoverCard.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
+            gameoverCanvasGroup.alpha = 1;
+            t2 = 0;
+            p=0;
+            while (t2 < flipDuration)
+            {
+                t2 += Time.deltaTime;
+                p = t2 / flipDuration;
+                gameoverCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 90, 0)), Quaternion.Euler(new Vector3(0, 0, 0)), validationAnimationCurve.Evaluate(p));
+                yield return null;
+            }
+            swipeBackgroundImage.color = swipeBackgroundColor1;
+
+
+    }
+
 
     public void SetInvestFeedback(int positiveness){
         // Return if positiveness is the same

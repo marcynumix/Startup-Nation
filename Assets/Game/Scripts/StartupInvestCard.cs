@@ -64,7 +64,8 @@ public class StartupInvestCard : MonoBehaviour
         }
 
         // Charger une startup aléatoire au démarrage
-        StartCoroutine(LoadRandomStartupCoroutine());
+        Swipeable.instance.Swipe();
+
     }
 
     public void LoadRandomStartup(){
@@ -123,9 +124,10 @@ public class StartupInvestCard : MonoBehaviour
         // Debug.Log($"Chargement de l'image : {imageFilePath}");
         StartCoroutine(LoadStartupImage(imageFilePath));
         LoadFounderPortraitImage();
-        string soundFileName = randomStartupName + "_founder.mp3";
+        string soundFileName = randomStartupName + ".mp3";
         string soundFilePath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups", soundFileName);    
         StartCoroutine(LoadStartupPitchSound(soundFilePath));
+
     }
 
     public void MutePitch()
@@ -169,7 +171,7 @@ public class StartupInvestCard : MonoBehaviour
     }
 
     private IEnumerator LoadStartupPitchSound(string filePath){
-        Debug.Log($"Chargement du son : {filePath}");
+        // Debug.Log($"Chargement du son : {filePath}");
         using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.MPEG))
         {
             yield return request.SendWebRequest();
@@ -185,6 +187,13 @@ public class StartupInvestCard : MonoBehaviour
                 Debug.LogWarning($"Erreur lors du chargement du son : {request.error}");
             }
         }
+    }
+
+    public void RestartGame(){
+        Player.instance.isGameOver = false;
+        Player.instance.Money = Player.instance.startMoney;
+        LoadRandomStartup();
+        Swipeable.instance.RestartGame();
     }
 
     [System.Serializable]
