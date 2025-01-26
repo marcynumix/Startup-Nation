@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class feedbackUI : MonoBehaviour
@@ -8,6 +9,8 @@ public class feedbackUI : MonoBehaviour
     public CanvasGroup feedbackInvestOKCanvasGroup;
     public RectTransform feedbackInvestNO;
     public CanvasGroup feedbackInvestNOCanvasGroup;
+    public TMPro.TextMeshProUGUI feedbackInvestOKText;
+    public TMPro.TextMeshProUGUI feedbackInvestNOText;
     public float feedbackTopPos = 350f;
     public float feedbackDownPos = 0f;
     public float feedbackAnimationSpeed = 1f;
@@ -25,6 +28,14 @@ public class feedbackUI : MonoBehaviour
         feedbackInvestNO.anchoredPosition = new Vector2(feedbackInvestNO.anchoredPosition.x, Mathf.Lerp(feedbackInvestNO.anchoredPosition.y, targetPositionNO, Time.deltaTime * feedbackAnimationSpeed));
         feedbackInvestOKCanvasGroup.alpha = Mathf.Lerp(feedbackInvestOKCanvasGroup.alpha, targetAlphaOK, Time.deltaTime * feedbackAnimationSpeed);
         feedbackInvestNOCanvasGroup.alpha = Mathf.Lerp(feedbackInvestNOCanvasGroup.alpha, targetAlphaNO, Time.deltaTime * feedbackAnimationSpeed);
+    }
+
+    public void SetText(bool isInvestOK, string text){
+        if(isInvestOK)
+            feedbackInvestOKText.text = text;
+        else
+            feedbackInvestNOText.text = text;
+
     }
 
     public void ResetPositions(){

@@ -32,6 +32,15 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public float flipDuration = 0.5f;
     bool isAnimating = false;
 
+    [Header("Audio")]
+    public AudioSource audioSourceInvestFeedback;
+    public AudioSource audioSourceBuy;
+    public AudioSource audioSourceFlip;
+    public AudioClip[] buySounds;
+    public AudioClip[] flipSounds;
+
+    public InvestFeedbackSO[] investFeedbacks;
+
     private RectTransform rectTransform;
     private Vector2 startPointerPosition;
     private Vector2 currentPointerPosition;
@@ -46,6 +55,8 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     private RectTransform currentTarget;
     private int swipeDirection=0;
+
+    private InvestFeedbackSO currentFeedback;
 
     private void Awake()
     {
@@ -95,8 +106,9 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             target = swipeRightRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
-            Debug.Log(p);
             feedbackUI.SetTargetPosition(1);
+            currentFeedback = GetInvestFeedback(1);
+            //feedbackUI.SetText(true, currentFeedback.investSentence);
             swipeDirection=1;
 
         }
@@ -106,6 +118,8 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeLeftRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             feedbackUI.SetTargetPosition(-1);
+            currentFeedback = GetInvestFeedback(-1);
+            //feedbackUI.SetText(false, currentFeedback.investSentence);
             swipeDirection=-1;
 
 
@@ -114,6 +128,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             target = swipeMiddleRef;
             feedbackUI.SetTargetPosition(0);
+
             p = 1;
             swipeDirection=0;
 
@@ -137,12 +152,24 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     private IEnumerator ValidateSwipe()
     {
+        
+        PlayInvestFeedbackSound();
+        
+
+
         isAnimating = true;
 
-        if(swipeDirection == 1)
+        bool isBuy = swipeDirection == 1;
+
+
+        if(isBuy){
+            PlayRandomSound(buySounds, audioSourceBuy);
             Player.instance.Money -= 100000;
-        else
-            Player.instance.Money += 100000;
+        }
+        else {
+            // Player.instance.Money += 100000;
+        }
+            
 
         RectTransform target = swipeDirection == 1 ? validateRightRef : validateLeftRef;
         float p = 0;
@@ -171,6 +198,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         // Return new Card !
 
         swipeBackFaceCard.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        
         // Animate back face card towards 90°
         swipeBackgroundImage.color = swipeBackgroundColor2;
         float t2 = 0;
@@ -182,6 +210,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             yield return null;
         }
         feedbackUI.ResetPositions();
+        PlayRandomSound(flipSounds, audioSourceFlip);
         // Animate SwipeElement card towards 0°
         swipeableElement.anchoredPosition = swipeMiddleRef.anchoredPosition;
         swipeableElement.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
@@ -198,5 +227,25 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         swipeBackgroundImage.color = swipeBackgroundColor1;
         isAnimating = false;
         
+    }
+
+    public InvestFeedbackSO GetInvestFeedback(int positiveness){
+        // filter feedbacks corresponding to positiveness
+        InvestFeedbackSO[] filteredFeedbacks = Array.FindAll(investFeedbacks, feedback => feedback.positiveness == positiveness);
+        // get a random feedback
+        return filteredFeedbacks[UnityEngine.Random.Range(0, filteredFeedbacks.Length)];
+
+    }
+
+    public void PlayInvestFeedbackSound()
+    {
+        
+        audioSourceInvestFeedback.PlayOneShot(currentFeedback.investSound);
+        
+    }
+
+    public void PlayRandomSound(AudioClip[] sounds, AudioSource audioSource)
+    {
+        audioSource.PlayOneShot(sounds[UnityEngine.Random.Range(0, sounds.Length)]);
     }
 }
