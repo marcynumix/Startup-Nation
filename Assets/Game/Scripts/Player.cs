@@ -9,8 +9,13 @@ public class Player : MonoBehaviour
 
     private int money = 1000000;
 
+    private int moneyBid = 1000;
+
     public delegate void MoneyChanged();
     public event MoneyChanged OnMoneyChanged;
+
+    public delegate void MoneyBidChanged();
+    public event MoneyBidChanged OnMoneyBidChanged;
     
 
     public int Money
@@ -30,6 +35,18 @@ public class Player : MonoBehaviour
         }
     }
 
+    public int MoneyBid
+    {
+        get
+        {
+            return moneyBid;
+        }
+        set
+        {
+            moneyBid = value;
+        }
+    }
+
     void Awake()
     {
         if (instance == null)
@@ -41,6 +58,7 @@ public class Player : MonoBehaviour
             Destroy(gameObject);
         }
         Money = startMoney;
+        MoneyBid = 0;
     }
 
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.AI;
+using System.Globalization;
 
 public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
@@ -14,6 +15,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public Color swipeBackgroundColor1;
     public Color swipeBackgroundColor2;
     public feedbackUI feedbackUI;
+    public TMPro.TextMeshProUGUI bidText;
 
     
     [Header("Positions de référence")]
@@ -30,6 +32,10 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
     public float validationAnimationDuration = 1f;
     public AnimationCurve validationAnimationCurve;
     public float flipDuration = 0.5f;
+
+    public float verticalTresholdRatio=0.5f;
+    public float verticalTreshold = 1200f;
+    public AnimationCurve verticalTresholdCurve;
     bool isAnimating = false;
 
     [Header("Audio")]
@@ -98,6 +104,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return;
         isDragging = true;
         dragDelta = currentPointerPosition - startPointerPosition;
+
         RectTransform target = null;
 
         float p=0;
@@ -107,7 +114,6 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeRightRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             feedbackUI.SetTargetPosition(1);
-            currentFeedback = GetInvestFeedback(1);
             //feedbackUI.SetText(true, currentFeedback.investSentence);
             swipeDirection=1;
 
@@ -118,7 +124,6 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeLeftRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             feedbackUI.SetTargetPosition(-1);
-            currentFeedback = GetInvestFeedback(-1);
             //feedbackUI.SetText(false, currentFeedback.investSentence);
             swipeDirection=-1;
 
@@ -135,8 +140,47 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         }
 
         targetPosition = Vector2.Lerp(initialElementPosition, target.anchoredPosition, p);
+        if(swipeDirection==1){
+            float pVertical = Mathf.Clamp01(Mathf.Abs(dragDelta.y) / verticalTreshold);
+            targetPosition.y += Mathf.Sign(dragDelta.y)*verticalTresholdCurve.Evaluate(pVertical)*verticalTreshold;// * verticalTresholdRatio;
+            
+            float pBid = Mathf.Clamp(dragDelta.y / verticalTreshold,-1,1);
+            // map value -1,1 to 0,1
+            pBid = (pBid + 1) / 2;
+            
+            int maxBid = Player.instance.Money;
+
+            Player.instance.MoneyBid = (int)GetBidPercentage(maxBid, pBid);
+            bidText.text = Player.instance.MoneyBid.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+
+            if(pBid==1){
+                SetInvestFeedback(2);
+            }
+            else{
+                SetInvestFeedback(1);
+            }
+        }
+        if(swipeDirection==-1){
+            SetInvestFeedback(-1);
+        }
+
         targetRotation = Quaternion.Lerp(swipeableElement.rotation, target.rotation, p);
 
+    }
+    // write a function that will take min, max, percentage, and will return 1 of 4 values (10%,25%,50%,100%)
+    // 0-0.25 -> 10%
+    // 0.25-0.5 -> 25%
+    // 0.5-0.75 -> 50%
+    // 0.75-1 -> 100%
+    private float GetBidPercentage(float max, float percentage){
+        if(percentage<0.25f)
+            return max*0.1f;
+        else if(percentage<0.5f)
+            return max*0.25f;
+        else if(percentage<0.75f)
+            return max*0.5f;
+        else
+            return max;
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -164,7 +208,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         if(isBuy){
             PlayRandomSound(buySounds, audioSourceBuy);
-            Player.instance.Money -= 100000;
+            Player.instance.Money -= Player.instance.MoneyBid;
         }
         else {
             // Player.instance.Money += 100000;
@@ -229,12 +273,16 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         
     }
 
-    public InvestFeedbackSO GetInvestFeedback(int positiveness){
-        // filter feedbacks corresponding to positiveness
+    public void SetInvestFeedback(int positiveness){
+        // Return if positiveness is the same
+        if(currentFeedback!=null && currentFeedback.positiveness==positiveness){
+            return ;
+        }
         InvestFeedbackSO[] filteredFeedbacks = Array.FindAll(investFeedbacks, feedback => feedback.positiveness == positiveness);
         // get a random feedback
-        return filteredFeedbacks[UnityEngine.Random.Range(0, filteredFeedbacks.Length)];
-
+        currentFeedback=filteredFeedbacks[UnityEngine.Random.Range(0, filteredFeedbacks.Length)];
+        //SetText
+        feedbackUI.SetText(positiveness>0, currentFeedback.investSentence);
     }
 
     public void PlayInvestFeedbackSound()

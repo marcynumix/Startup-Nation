@@ -806,6 +806,7 @@ MonoBehaviour:
   swipeBackgroundColor1: {r: 1, g: 1, b: 1, a: 1}
   swipeBackgroundColor2: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 1}
   feedbackUI: {fileID: 1903521569}
+  bidText: {fileID: 736454291}
   swipeLeftRef: {fileID: 1925791939}
   swipeMiddleRef: {fileID: 2031620924}
   swipeRightRef: {fileID: 1575877709}
@@ -814,7 +815,7 @@ MonoBehaviour:
   dragTreshold: 400
   centerTreshold: 200
   swipeSpeed: 10
-  validationAnimationDuration: 0.5
+  validationAnimationDuration: 0.4
   validationAnimationCurve:
     serializedVersion: 2
     m_Curve:
@@ -840,6 +841,32 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   flipDuration: 0.2
+  verticalTresholdRatio: 0.5
+  verticalTreshold: 400
+  verticalTresholdCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   audioSourceInvestFeedback: {fileID: 337965951}
   audioSourceBuy: {fileID: 1437089459}
   audioSourceFlip: {fileID: 1725919654}
@@ -854,8 +881,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a8133e2981956cd45b3e926af74c45df, type: 2}
   - {fileID: 11400000, guid: 3572dedd7582f1c4ab0137782dd2ba48, type: 2}
   - {fileID: 11400000, guid: 62610c68254f48d44a8cfe9a9d0c25fd, type: 2}
-  - {fileID: 11400000, guid: 11f189d2f5b83d64996acf6756a5ff59, type: 2}
   - {fileID: 11400000, guid: 92778bb4f0c9d5348b4f63de53c23887, type: 2}
+  - {fileID: 11400000, guid: 20b8b1d34b5faa94b9be81b10297759a, type: 2}
 --- !u!1 &363836393
 GameObject:
   m_ObjectHideFlags: 0
@@ -2127,7 +2154,7 @@ GameObject:
   - component: {fileID: 736454292}
   - component: {fileID: 736454291}
   m_Layer: 5
-  m_Name: InvestMoneyText
+  m_Name: BidMoneyText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2418,7 +2445,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &830379354
 RectTransform:
   m_ObjectHideFlags: 0

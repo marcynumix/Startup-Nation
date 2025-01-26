@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0c781d52d3535f24c86e7ba44bce156c, type: 3}
-  m_Name: Yes_yes2
+  m_Name: Yes_Allin
   m_EditorClassIdentifier: 
   investSound: {fileID: 8300000, guid: 0d54c324df918bc4ebf506752d5d651e, type: 3}
-  investSentence: Yes!
-  positiveness: 1
+  investSentence: All in!
+  positiveness: 2

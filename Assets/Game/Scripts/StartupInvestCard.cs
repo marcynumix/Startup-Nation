@@ -95,7 +95,7 @@ public class StartupInvestCard : MonoBehaviour
 
         // Charger l'image correspondante
         string imageFilePath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups", randomStartupName + "_founder.png");
-        Debug.Log($"Chargement de l'image : {imageFilePath}");
+        // Debug.Log($"Chargement de l'image : {imageFilePath}");
         StartCoroutine(LoadStartupImage(imageFilePath));
         LoadFounderPortraitImage();
         
