@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq; 
+using System.Linq;
 using System.Threading.Tasks;
 
 public class StartupGeneratorWindow : EditorWindow
@@ -18,19 +18,19 @@ public class StartupGeneratorWindow : EditorWindow
 
     private int numberOfStartups = 1; // Nombre de startups à générer
     private bool deleteOldData = false; // Supprimer les anciennes données (checkbox)
-    private bool generateImage = false; // Générer une image (checkbox)
+    private bool generateImage = true; // Générer une image (checkbox)
 
     // Nouveaux paramètres OpenAI
     private string selectedModel = "gpt-3.5-turbo"; // Modèle OpenAI sélectionné
     private readonly string[] modelOptions = { "gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo" }; // Modèles disponibles
-    
-    private string selectedImageModel = "dall-e-3";
-    private readonly string[] imageModelOptions = { "dall-e-3" };
+
+    private string selectedImageModel = "stable-diffusion-3.5";
+    private readonly string[] imageModelOptions = { "dall-e-3", "stable-diffusion-3.5" };
 
     private string selectedImageSize = "1024x1024";
     private readonly string[] imageSizeOptions = { "1024x1024" };
 
-    private int maxTokens = 200; // Nombre maximum de tokens
+    private int maxTokens = 400; // Nombre maximum de tokens
     private float temperature = 0.7f; // Température
 
     [MenuItem("Tools/Startup Generator")]
@@ -134,7 +134,7 @@ public class StartupGeneratorWindow : EditorWindow
         }
     }
 
-private void LoadFounderImagePrompt()
+    private void LoadFounderImagePrompt()
     {
         // Chemin vers le fichier de founder image prompt
         string founderImagePromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/founder-image-prompt.txt");
@@ -248,7 +248,7 @@ private void LoadFounderImagePrompt()
             {
                 // Conteneur avec une hauteur fixe de 500 pixels
                 EditorGUILayout.BeginVertical(GUILayout.Height(200));
-                
+
                 // Barre de défilement à l'intérieur du conteneur
                 scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition);
 
@@ -348,8 +348,12 @@ private void LoadFounderImagePrompt()
                 // Appeler l'API OpenAI pour chaque startup générée et attendre la réponse
                 string response = await OpenAIClient.SendPromptAsync(systemPrompt, finalPrompt, selectedModel, maxTokens, temperature);
 
+
                 // Parse la réponse pour extraire le contenu JSON
                 string content = ExtractJsonContentFromResponse(response);
+
+                Debug.Log("Response received" + content);
+
                 if (!string.IsNullOrEmpty(content))
                 {
                     SaveGeneratedStartupToFile(content); // Sauvegarder le contenu JSON dans un fichier
@@ -370,8 +374,6 @@ private void LoadFounderImagePrompt()
             {
                 Debug.LogError($"Error generating startup #{i + 1}: {ex.Message}");
             }
-            Debug.Log("Attendre 5s entre chaque génération");
-            await Task.Delay(5000); // Attendre 5 secondes entre chaque génération
         }
 
         Debug.Log("Startup generation complete.");
@@ -380,24 +382,63 @@ private void LoadFounderImagePrompt()
     private async Task GenerateFounderImage(string jsonContent)
     {
         // Construire le prompt basé sur le contenu JSON
-        string prompt = founderImagePrompt.Replace("{json}", jsonContent);
+        string prompt = ExtractImagePromptFromJson(jsonContent);
 
         try
         {
             Debug.Log("Generating founder image..." + selectedImageSize + "/" + selectedImageModel + " prompt:" + prompt);
-            Texture2D image = await OpenAIClient.SendPromptImageAsync(prompt, selectedImageSize, selectedImageModel);
 
-            if (image != null)
+            if (selectedImageModel.Equals("dall-e-3"))
             {
+                Debug.Log("Generating dall-e-3 image...");
+                Texture2D image = await OpenAIClient.SendPromptImageAsync(prompt, selectedImageSize, selectedImageModel);
+
+                if (image != null)
+                {
+                    // Extraire le nom de la startup depuis le JSON pour nommer le fichier
+                    string startupName = ExtractStartupNameFromJson(jsonContent);
+
+                    if (string.IsNullOrEmpty(startupName))
+                    {
+                        Debug.LogError("Failed to extract 'StartupName' from the JSON content for founder image.");
+                        return;
+                    }
+
+                    string fileName = $"{ToCamelCase(startupName)}_founder.png";
+
+                    // Chemin complet pour l'image
+                    string generatedFolderPath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups");
+
+                    if (!Directory.Exists(generatedFolderPath))
+                    {
+                        Directory.CreateDirectory(generatedFolderPath);
+                    }
+
+                    string filePath = Path.Combine(generatedFolderPath, fileName);
+
+                    // Sauvegarder l'image en PNG
+                    File.WriteAllBytes(filePath, image.EncodeToPNG());
+                    Debug.Log($"Founder image saved to: {filePath}");
+                }
+                else
+                {
+                    Debug.LogError("Failed to generate founder image.");
+                }
+            }
+            else
+            {
+                string style = "Kawaii futuristic UI design, pastel color palette, retro 90s aesthetics, cyber minimalism, cute tech interface, cartoonish elements, soft grid background, neon glow accents, stylized 2D character, high-tech gadget with friendly expressions, sci-fi meets cute design";
+                string exePath = @"Assets\Resources\main.exe";  // Ensure correct path
+                string arguments = $"\"192.168.1.72:8188\" \"{prompt}{style}\"";  // Include quotes for parameters with spaces
+
+                RunProcess(exePath, arguments);
+
+                Debug.Log("Image generated successfully.");
+
                 // Extraire le nom de la startup depuis le JSON pour nommer le fichier
                 string startupName = ExtractStartupNameFromJson(jsonContent);
 
-                if (string.IsNullOrEmpty(startupName))
-                {
-                    Debug.LogError("Failed to extract 'StartupName' from the JSON content for founder image.");
-                    return;
-                }
-
+                //Image is generated in /output.png, move it to the correct folder
                 string fileName = $"{ToCamelCase(startupName)}_founder.png";
 
                 // Chemin complet pour l'image
@@ -408,20 +449,52 @@ private void LoadFounderImagePrompt()
                     Directory.CreateDirectory(generatedFolderPath);
                 }
 
-                string filePath = Path.Combine(generatedFolderPath, fileName);
+                // Move the image to the correct folder
+                string sourcePath = "output_50_0.png";
+                string destinationPath = Path.Combine(generatedFolderPath, fileName);
 
-                // Sauvegarder l'image en PNG
-                File.WriteAllBytes(filePath, image.EncodeToPNG());
-                Debug.Log($"Founder image saved to: {filePath}");
-            }
-            else
-            {
-                Debug.LogError("Failed to generate founder image.");
+                if (File.Exists(sourcePath))
+                {
+                    File.Move(sourcePath, destinationPath);
+                    Debug.Log($"Founder image saved to: {destinationPath}");
+                }
             }
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"Error generating founder image: {ex.Message}");
+        }
+    }
+
+    static void RunProcess(string exePath, string arguments)
+    {
+        System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = exePath,
+            Arguments = arguments,
+            RedirectStandardOutput = true,  // Capture output if needed
+            RedirectStandardError = true,
+            UseShellExecute = false,  // Important for output redirection
+            CreateNoWindow = true  // Prevent showing a command prompt window
+        };
+
+        try
+        {
+            using (System.Diagnostics.Process process = new System.Diagnostics.Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+
+                // Read output (optional)
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();  // Ensure the process completes before continuing
+            }
+        }
+        catch (System.Exception e)
+        {
+            UnityEngine.Debug.LogError("Error starting process: " + e.Message);
         }
     }
 
@@ -498,7 +571,7 @@ private void LoadFounderImagePrompt()
             // Extraire le contenu JSON depuis choices[0].message.content
             if (chatResponse != null && chatResponse.choices != null && chatResponse.choices.Length > 0)
             {
-                string jsonContent = chatResponse.choices[0].message.content.Replace("json","").Replace("```",""); // Supprimer les balises de code
+                string jsonContent = chatResponse.choices[0].message.content.Replace("json", "").Replace("```", ""); // Supprimer les balises de code
                 return jsonContent;
             }
             else
@@ -525,6 +598,21 @@ private void LoadFounderImagePrompt()
         catch (System.Exception ex)
         {
             Debug.LogError($"Failed to extract 'StartupName' from JSON: {ex.Message}");
+            return null;
+        }
+    }
+
+    private string ExtractImagePromptFromJson(string jsonContent)
+    {
+        try
+        {
+            // Désérialiser le JSON partiellement pour accéder uniquement à l'ImagePrompt
+            var startupData = JsonUtility.FromJson<StartupData>(jsonContent);
+            return startupData?.ImagePrompt ?? "";
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Failed to extract 'ImagePrompt' from JSON: {ex.Message}");
             return null;
         }
     }
@@ -608,7 +696,9 @@ private void LoadFounderImagePrompt()
     private class StartupData
     {
         public string StartupName;
+        public string ImagePrompt;
     }
+
     [System.Serializable]
     private class StartupList
     {
