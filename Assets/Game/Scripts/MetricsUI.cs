@@ -52,7 +52,6 @@ public class MetricsUI : MonoBehaviour
         int[] order = GetRandomOrder();
 
         // S STARTUP
-        Debug.Log("Success Rate: "+successRate);
         if(successRate>0.9){
             targetValues[order[0]]=1;
             targetValues[order[1]]=1;

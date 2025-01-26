@@ -12,7 +12,8 @@ public class StartupInvestCard : MonoBehaviour
     public TMPro.TextMeshProUGUI startupName;
     public Image startupImage;
     public Image founderPortraitImage;
-    public Sprite[] founderPortraits;
+    public Sprite[] founderPortraits_Male;
+    public Sprite[] founderPortraits_Female;
     public TMPro.TextMeshProUGUI startupPitch;
     public TMPro.TextMeshProUGUI founderName;
     public TMPro.TextMeshProUGUI founderNameShadow;
@@ -110,7 +111,7 @@ public class StartupInvestCard : MonoBehaviour
 
         // Convertir les données JSON
         currentStartup = JsonUtility.FromJson<StartupData>(jsonRequest.downloadHandler.text);
-
+         Debug.Log("currentStartup: "+currentStartup.StartupName + " founderSex:" + currentStartup.FounderSex);
         // MAJ Metrics UI
         MetricsUI.instance.SetMetrics(currentStartup.SuccessRate);
 
@@ -147,6 +148,7 @@ public class StartupInvestCard : MonoBehaviour
 
     private void LoadFounderPortraitImage(){
         // Randomize founder portrait image
+        Sprite[] founderPortraits = currentStartup.FounderSex=="homme"?founderPortraits_Male:founderPortraits_Female;
         int id = Random.Range(0, founderPortraits.Length);
         founderPortraitImage.sprite = founderPortraits[id];
     }
