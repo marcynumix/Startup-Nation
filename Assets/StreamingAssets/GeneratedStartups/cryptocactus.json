@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "CryptoCactus",
+    "FounderName": "Jean-Pierre Dupin",
+    "FounderTraits": "incompétent, légèrement malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien vendeur de chaussettes en ligne",
+    "Pitch": "CryptoCactus est la première plateforme de trading de cactus numériques, utilisant la technologie blockchain pour garantir l'authenticité de chaque cactus virtuel. Grâce à notre algorithme révolutionnaire, vous pouvez désormais investir dans la plante de demain. Rejoignez la révolution verte 2.0 !",
+    "Place": "chambre de sa mamie",
+    "SuccessRate": 0.3,
+    "ROI": 0.2,
+    "ImagePrompt": "A digital, slightly pixelated cactus with blockchain symbols floating around it, set in a futuristic garden with neon lights.",
+    "VocalPrompt": "A confident yet slightly unsure male voice, with a hint of overenthusiasm and a touch of mischievousness."
+}

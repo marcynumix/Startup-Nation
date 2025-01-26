@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "ChapeauxVirtuels",
+    "FounderName": "Jean-Baptiste Rigolo",
+    "FounderTraits": "incompétent et légèrement malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien vendeur de chapeaux de fête",
+    "Pitch": "Découvrez ChapeauxVirtuels, la première application de réalité augmentée qui vous permet d'essayer des chapeaux invisibles. Vous ne les verrez peut-être pas, mais vos amis seront impressionnés ! Téléchargez maintenant et entrez dans le futur de la mode.",
+    "Place": "garage de sa tante",
+    "SuccessRate": 0.2,
+    "ROI": 0.3,
+    "ImagePrompt": "An augmented reality app interface showing a person wearing an invisible hat, with a colorful and slightly amateurish design.",
+    "VocalPrompt": "A slightly nervous and overly enthusiastic male voice with a French accent, sounding like he's trying too hard to sell something."
+}

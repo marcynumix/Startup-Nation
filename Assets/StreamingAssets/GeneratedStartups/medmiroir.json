@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "MedMiroir",
+    "FounderName": "Jean-Loup Transparence",
+    "FounderTraits": "compétent et honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "10 ans dans la recherche biomédicale et 5 ans en gestion de projet MedTech",
+    "Pitch": "Chez MedMiroir, nous avons conçu le premier miroir intelligent qui analyse votre état de santé en temps réel grâce à votre reflet. Notre technologie de pointe utilise l'imagerie spectrale pour détecter les anomalies cutanées et vous avertir instantanément. Avec MedMiroir, votre santé est littéralement sous vos yeux.",
+    "Place": "incubateur de prestige",
+    "SuccessRate": 0.8,
+    "ROI": 0.9,
+    "ImagePrompt": "A futuristic smart mirror with a sleek design, reflecting a person's health data in real-time, surrounded by advanced medical equipment, high resolution, photorealistic.",
+    "VocalPrompt": "A confident and sincere male voice with a touch of French accent, clearly explaining a new health technology"
+}

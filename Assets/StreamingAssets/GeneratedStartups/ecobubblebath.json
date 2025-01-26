@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "EcoBubbleBath",
+    "FounderName": "Lucien Lavage",
+    "FounderTraits": "compétent et malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien ingénieur en chimie des matériaux chez une multinationale de produits d'entretien",
+    "Pitch": "EcoBubbleBath révolutionne votre salle de bain avec des bulles de savon qui purifient l'air tout en lavant votre corps. Grâce à notre technologie brevetée, chaque bain devient un acte pour la planète. Rejoignez la révolution écologique et sentez-vous propre, à l'intérieur comme à l'extérieur.",
+    "Place": "lab dans un incubateur prestigieux",
+    "SuccessRate": 0.7,
+    "ROI": 0.3,
+    "ImagePrompt": "a luxurious bathtub surrounded by eco-friendly soap bubbles, with a futuristic design and a subtle green tint, high quality, photorealistic",
+    "VocalPrompt": "a deep and convincing male voice with a slight air of mystery and confidence"
+}

@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "SecureSortie",
+    "FounderName": "Jean-Baptiste Boulet",
+    "FounderTraits": "Incompétent mais incroyablement honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "Ancien assistant administratif dans une PME",
+    "Pitch": "Chez SecureSortie, nous protégeons vos sorties avec un système de sécurité qui fonctionne à 70% du temps. Pas encore parfait, mais on y travaille !",
+    "Place": "Chambre d'amis de sa tante",
+    "SuccessRate": 0.3,
+    "ROI": 0.5,
+    "ImagePrompt": "A semi-functional, slightly glitchy looking cybersecurity device with bright LEDs and a makeshift design, set on a cluttered desk in a cozy room.",
+    "VocalPrompt": "A warm and sincere male voice, with a touch of uncertainty, speaking in French with a slight regional accent."
+}

@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "VibrantVitality",
+    "FounderName": "Léon Dupin",
+    "FounderTraits": "incompétent et malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien vendeur de compléments alimentaires en ligne",
+    "Pitch": "VibrantVitality révolutionne le monde de la santé avec notre bracelet qui prétend diagnostiquer 100 maladies en temps réel. Ne vous souciez pas des visites médicales, laissez notre technologie miraculeuse faire le travail. Investissez dans la santé du futur, aujourd'hui !",
+    "Place": "garage de son cousin",
+    "SuccessRate": 0.2,
+    "ROI": 0.1,
+    "ImagePrompt": "A low-quality image of a cheap-looking bracelet with blinking lights, designed to look like a medical device, placed on a cluttered workbench in a dimly lit garage.",
+    "VocalPrompt": "A confident yet slightly dubious male voice, with a hint of charm but lacking in technical knowledge, trying to sound convincing and trustworthy."
+}

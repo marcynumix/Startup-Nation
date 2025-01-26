@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "GridGourmet",
+    "FounderName": "Camille Watt",
+    "FounderTraits": "compétent et honnête",
+    "FounderSex": "femme",
+    "FounderExperience": "10 ans d'expérience en ingénierie énergétique dans une grande entreprise",
+    "Pitch": "Chez GridGourmet, nous transformons votre réseau électrique en chef cuisinier. Grâce aux Smart Grids, vos appareils ménagers ajustent automatiquement leur consommation pour préparer des repas savoureux. Dites adieu aux recettes ratées grâce à l'énergie intelligente !",
+    "Place": "incubateur de prestige",
+    "SuccessRate": 0.8,
+    "ROI": 0.9,
+    "ImagePrompt": "A futuristic kitchen appliance with a sleek design, combining elements of a smart grid interface, showing a gourmet meal being prepared automatically. The appliance should look high-tech and efficient.",
+    "VocalPrompt": "A confident and warm female voice, speaking clearly and with a touch of enthusiasm, conveying expertise and honesty in energy solutions."
+}

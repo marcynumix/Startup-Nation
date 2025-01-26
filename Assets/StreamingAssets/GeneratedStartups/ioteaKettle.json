@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "IoTea Kettle",
+    "FounderName": "Léonard Bouilloire",
+    "FounderTraits": "compétent et honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "Ingénieur en systèmes embarqués avec 10 ans d'expérience dans l'industrie des appareils ménagers",
+    "Pitch": "IoTea Kettle est la première bouilloire connectée qui sait exactement comment vous aimez votre thé. Elle ajuste automatiquement la température et vous envoie une notification lorsque votre infusion est parfaite.",
+    "Place": "incubateur de prestige",
+    "SuccessRate": 0.8,
+    "ROI": 0.9,
+    "ImagePrompt": "A high-quality image of a sleek, modern smart kettle with a digital display, set in a kitchen environment, showcasing its connected features.",
+    "VocalPrompt": "A confident and clear male voice with a slight French accent, conveying enthusiasm and expertise."
+}

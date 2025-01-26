@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "BlockPets",
+    "FounderName": "Lucie Maletrou",
+    "FounderTraits": "compétente et malhonnête",
+    "FounderSex": "femme",
+    "FounderExperience": "ancienne directrice technique chez un grand réseau social",
+    "Pitch": "Chez BlockPets, nous utilisons la blockchain pour certifier l'unicité et la pureté génétique de votre animal de compagnie. Investissez dans le futur de l'élevage! Avec BlockPets, chaque chien est un NFT vivant.",
+    "Place": "incubateur de prestige",
+    "SuccessRate": 0.7,
+    "ROI": 0.4,
+    "ImagePrompt": "A futuristic digital interface displaying a genetic blueprint of a dog, surrounded by blockchain symbols, in a sleek and polished tech environment",
+    "VocalPrompt": "A confident and persuasive female voice with a slight air of mystery and charm, speaking with authority"
+}

@@ -1,1 +1,0 @@
-Generate an image with no text, depicting the portrait of the founder of a startup.  {json}. "The image should be in a funny 3d and stylized illustration style."

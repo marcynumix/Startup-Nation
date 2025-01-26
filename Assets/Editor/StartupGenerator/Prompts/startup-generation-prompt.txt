@@ -1,14 +1,16 @@
-Génère une startup absurde incluant la technologie {technologies} présentée par un fondateur ayant le trait de personnalité : {foundertraits}. S'il est malhonnête ou incompétent, il ne faut pas que ça soit trop évident. L'expérience professionnelle correspondra à son niveau de compétence. Le champ place correspond à son lieu de travail actuel plus ou moins prestigieux (ex: garage, chambre de sa mamie, incubateur de prestige). Le taux de réussite de cette startup sera entre 0 et 1 en fonction des traits de personnalité, et de l'expérience professionnel, et du lieu de travail. Le ROI est calculé en fonction de l'honneté du fondateur (valeur entre 0 et 1). Le champ ImagePrompt doit contenir le prompt pour générer la photo du produit sur stable diffusion.
+Génère une startup absurde incluant la technologie {technologies} présentée par un fondateur ayant le trait de personnalité : {foundertraits}. Le fondateur peut être un homme ou une femme. S'il est malhonnête ou incompétent, il ne faut pas que ça soit trop évident. L'expérience professionnelle correspondra à son niveau de compétence. Le champ place correspond à son lieu de travail actuel plus ou moins prestigieux (ex: garage, chambre de sa mamie, incubateur de prestige). Le taux de réussite de cette startup sera entre 0 et 1 en fonction des traits de personnalité, et de l'expérience professionnel, et du lieu de travail. Le ROI est calculé en fonction de l'honneté du fondateur (valeur entre 0 et 1). Le champ ImagePrompt doit contenir le prompt pour générer la photo du produit sur stable diffusion, le produit doit être de plus ou moins de bonne qualité en fonction de la compétence du fondateur. Le champ FounderSex doit être homme ou femme. Le champ VocalPrompt doit être un prompt audio ElevenLabs qui définit le caractère de la voix du fondateur.
 
 Ton retour sera strictement au format json suivant :
 {
     "StartupName": "Nom de la startup",
     "FounderName": "Nom du fondateur rigolo",
     "FounderTraits": "foundertraits du fondateur",
+    "FounderSex": "sex",
     "FounderExperience": "expérience professionnelle du fondateur",
     "Pitch": "Pitch du fondateur en trois phrases maximum",
     "Place": "place",
     "SuccessRate": 0.5,
     "ROI": 0,
-    "ImagePrompt": "prompt"
+    "ImagePrompt": "prompt",
+	"VocalPrompt": "prompt"
 }

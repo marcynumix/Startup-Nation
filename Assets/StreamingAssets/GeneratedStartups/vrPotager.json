@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "VR-Potager",
+    "FounderName": "Hervé Dupont",
+    "FounderTraits": "incompétent et honnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien animateur de club de jardinage",
+    "Pitch": "Découvrez le jardinage en réalité virtuelle avec VR-Potager. Vous ne ferez plus jamais mourir de plantes, mais vous ne mangerez rien non plus. C'est l'expérience végétale ultime, sans les nuisibles !",
+    "Place": "garage de ses parents",
+    "SuccessRate": 0.3,
+    "ROI": 0.7,
+    "ImagePrompt": "A VR headset displaying a poorly rendered vegetable garden with cartoonish vegetables, in a messy garage setting",
+    "VocalPrompt": "A cheerful, slightly bumbling male voice with a hint of rural accent, conveying honesty and enthusiasm"
+}

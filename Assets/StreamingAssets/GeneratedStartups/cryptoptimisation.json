@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "CryptOptimisation",
+    "FounderName": "Jean-Charles Dupin",
+    "FounderTraits": "compétent et légèrement malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien développeur de logiciels pour une grande banque",
+    "Pitch": "CryptOptimisation utilise l'intelligence artificielle pour prédire les crypto-tendances avec une précision inégalée. Grâce à notre algorithme breveté, vous pouvez maximiser vos profits en crypto-monnaies de manière entièrement automatisée. Ne laissez pas l'incertitude vous empêcher de capitaliser sur le futur.",
+    "Place": "petit bureau dans un espace de coworking branché",
+    "SuccessRate": 0.6,
+    "ROI": 0.2,
+    "ImagePrompt": "A sleek and modern fintech app interface on a smartphone screen, showcasing dynamic graphs and crypto trading features. The design is polished, with a futuristic and professional look.",
+    "VocalPrompt": "A confident and persuasive male voice with a hint of charm, speaking in a smooth and engaging manner, suitable for an innovative fintech startup pitch."
+}

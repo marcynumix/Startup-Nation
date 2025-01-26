@@ -1,0 +1,14 @@
+
+{
+    "StartupName": "NanoBreath",
+    "FounderName": "Jean-Michel Dupont",
+    "FounderTraits": "incompétent et malhonnête",
+    "FounderSex": "homme",
+    "FounderExperience": "ancien vendeur de téléshopping",
+    "Pitch": "Nous avons miniaturisé l'air lui-même. Imaginez respirer des nano-particules d'oxygène pour une performance accrue. Rejoignez la révolution NanoBreath !",
+    "Place": "chambre de sa mamie",
+    "SuccessRate": 0.2,
+    "ROI": 0.1,
+    "ImagePrompt": "a prototype of a futuristic breathing device with a questionable design, poorly made, showing nano particles floating around, in a cluttered room",
+    "VocalPrompt": "a slightly nervous and overly enthusiastic male voice with a hint of insincerity and a touch of amateurism"
+}
