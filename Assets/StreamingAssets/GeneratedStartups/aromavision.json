@@ -1,0 +1,13 @@
+{
+    "StartupName": "ARoma Vision",
+    "FounderName": "Stéphanie Florale",
+    "FounderTraits": "Incompétent et honnête",
+    "FounderSex": "femme",
+    "FounderExperience": "Ancien assistant de librairie",
+    "Pitch": "Avec ARoma Vision, découvrez des parfums en réalité augmentée, même si je ne sais pas trop comment ça marche. Je suis sûre que ça va révolutionner le monde des odeurs, ou pas. En tout cas, c'est une idée qui sent bon!",
+    "Place": "Chambre de sa mamie",
+    "SuccessRate": 0.2,
+    "ROI": 0.9,
+    "ImagePrompt": "A virtual reality headset with a small fan attached, blowing scents towards the user. The device looks clunky and somewhat amateurish, yet charming in its own way. The background should show a cozy, cluttered room with books and knick-knacks.",
+    "VocalPrompt": "Create a voice that sounds a bit unsure, friendly, and slightly comical, with a hint of a French accent, as if the speaker is trying their best but is clearly out of their depth."
+}
