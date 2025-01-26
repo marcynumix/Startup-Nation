@@ -1,0 +1,12 @@
+
+{
+    "StartupName": "GeneVibes",
+    "FounderName": "Hugo LeBluffeur",
+    "FounderTraits": "compétent et malhonnête",
+    "FounderExperience": "ancien chercheur en génétique avec une décennie d'expérience chez une grande entreprise pharmaceutique",
+    "Pitch": "Chez GeneVibes, nous utilisons la technologie des vibrations génétiques pour améliorer votre ADN au quotidien. Révélez le potentiel caché de vos gènes grâce à notre application mobile révolutionnaire. Transformez votre vie sans effort !",
+    "Place": "incubateur de prestige",
+    "SuccessRate": 0.7,
+    "ROI": 0.2,
+    "ImagePrompt": "a futuristic mobile app interface showing DNA strands with colorful vibrations, in a sleek and modern design"
+}
