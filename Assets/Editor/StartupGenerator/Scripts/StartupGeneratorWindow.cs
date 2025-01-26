@@ -20,14 +20,14 @@ public class StartupGeneratorWindow : EditorWindow
     private bool generateImage = true; // Générer une image (checkbox)
 
     // Nouveaux paramètres OpenAI
-    private string selectedModel = "gpt-3.5-turbo"; // Modèle OpenAI sélectionné
+    private string selectedModel = "gpt-4o"; // Modèle OpenAI sélectionné
     private readonly string[] modelOptions = { "gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo" }; // Modèles disponibles
 
     private string selectedImageModel = "stable-diffusion-3.5";
     private readonly string[] imageModelOptions = { "dall-e-3", "stable-diffusion-3.5" };
 
-    private string selectedImageSize = "1024x1024";
-    private readonly string[] imageSizeOptions = { "1024x1024" };
+    private string selectedImageSize = "512x512";
+    private readonly string[] imageSizeOptions = { "512x512" };
 
     private int maxTokens = 400; // Nombre maximum de tokens
     private float temperature = 0.7f; // Température
