@@ -671,35 +671,7 @@ MonoBehaviour:
   swipeBackgroundImage: {fileID: 1794925362}
   swipeBackgroundColor1: {r: 1, g: 1, b: 1, a: 1}
   swipeBackgroundColor2: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 1}
-  feedbackInvestOK: {fileID: 435330466}
-  feedbackInvestNO: {fileID: 1204837364}
-  feedbackTopPos: 350
-  feedbackDownPos: 0
-  feedbackAnimationDuration: 1
-  feedbackAnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  feedbackUI: {fileID: 1903521569}
   swipeLeftRef: {fileID: 1925791939}
   swipeMiddleRef: {fileID: 2031620924}
   swipeRightRef: {fileID: 1575877709}
@@ -996,6 +968,7 @@ GameObject:
   m_Component:
   - component: {fileID: 435330466}
   - component: {fileID: 435330468}
+  - component: {fileID: 435330469}
   m_Layer: 5
   m_Name: FeedbackInvestOK
   m_TagString: Untagged
@@ -1033,6 +1006,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 435330465}
   m_CullTransparentMesh: 1
+--- !u!225 &435330469
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435330465}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &495821470
 GameObject:
   m_ObjectHideFlags: 0
@@ -3083,6 +3068,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1204837364}
   - component: {fileID: 1204837365}
+  - component: {fileID: 1204837366}
   m_Layer: 5
   m_Name: FeedbackInvestNO
   m_TagString: Untagged
@@ -3119,6 +3105,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1204837363}
   m_CullTransparentMesh: 1
+--- !u!225 &1204837366
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1204837363}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1217870804
 GameObject:
   m_ObjectHideFlags: 0
@@ -4532,31 +4530,7 @@ MonoBehaviour:
   feedbackInvestNO: {fileID: 1204837364}
   feedbackTopPos: 350
   feedbackDownPos: 0
-  feedbackAnimationDuration: 0.5
-  feedbackAnimationCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  feedbackAnimationSpeed: 10
 --- !u!1 &1925791938
 GameObject:
   m_ObjectHideFlags: 0

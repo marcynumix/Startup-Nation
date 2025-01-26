@@ -5,61 +5,58 @@ public class feedbackUI : MonoBehaviour
 {
 
     public RectTransform feedbackInvestOK;
+    public CanvasGroup feedbackInvestOKCanvasGroup;
     public RectTransform feedbackInvestNO;
+    public CanvasGroup feedbackInvestNOCanvasGroup;
     public float feedbackTopPos = 350f;
     public float feedbackDownPos = 0f;
-    public float feedbackAnimationDuration = 1f;
-    public AnimationCurve feedbackAnimationCurve;
+    public float feedbackAnimationSpeed = 1f;
+    private float targetPositionOK;
+    private float targetAlphaOK;
+    private float targetPositionNO;
+    private float targetAlphaNO;
 
-    private bool isInvestOK = false;
-    private bool show = false;
+    public void Start(){
+        ResetPositions();
+    }
+    
+    void Update() {
+        feedbackInvestOK.anchoredPosition = new Vector2(feedbackInvestOK.anchoredPosition.x, Mathf.Lerp(feedbackInvestOK.anchoredPosition.y, targetPositionOK, Time.deltaTime * feedbackAnimationSpeed));
+        feedbackInvestNO.anchoredPosition = new Vector2(feedbackInvestNO.anchoredPosition.x, Mathf.Lerp(feedbackInvestNO.anchoredPosition.y, targetPositionNO, Time.deltaTime * feedbackAnimationSpeed));
+        feedbackInvestOKCanvasGroup.alpha = Mathf.Lerp(feedbackInvestOKCanvasGroup.alpha, targetAlphaOK, Time.deltaTime * feedbackAnimationSpeed);
+        feedbackInvestNOCanvasGroup.alpha = Mathf.Lerp(feedbackInvestNOCanvasGroup.alpha, targetAlphaNO, Time.deltaTime * feedbackAnimationSpeed);
+    }
 
-    void Start()
-    {
-        // initialize feedback position at top position
+    public void ResetPositions(){
+        feedbackInvestOK.gameObject.SetActive(true);
+        feedbackInvestNO.gameObject.SetActive(true);
         feedbackInvestOK.anchoredPosition = new Vector2(feedbackInvestOK.anchoredPosition.x, feedbackTopPos);
         feedbackInvestNO.anchoredPosition = new Vector2(feedbackInvestNO.anchoredPosition.x, feedbackTopPos);
+        targetPositionOK=feedbackTopPos;
+        targetPositionNO=feedbackTopPos;
     }
 
-
-    public void ToggleFeedback(bool isCenter, bool _isInvestOK, bool _show)
+    public void SetTargetPosition(int targetPOS)
     {
-        if(isInvestOK == _isInvestOK && show == _show)
-            return; 
-        isInvestOK = _isInvestOK;
-        show = _show;
-        RectTransform feedback = _isInvestOK ? feedbackInvestOK : feedbackInvestNO;
-        StartCoroutine(AnimateFeedback(isCenter, _isInvestOK, _show));
-    }
-
-    IEnumerator AnimateFeedback(bool isCenter, bool isInvestOK, bool show)
-    {
-        if(!isCenter) {
-            feedbackInvestOK.gameObject.SetActive(isInvestOK);
-            feedbackInvestNO.gameObject.SetActive(!isInvestOK);
+        if(targetPOS==1){
+            targetPositionOK=feedbackDownPos;
+            targetPositionNO=feedbackTopPos;
+            targetAlphaOK=1;
+            targetAlphaNO=0;
         }
-
-        RectTransform feedback = isInvestOK ? feedbackInvestOK : feedbackInvestNO;
-
-        Debug.Log("Animate" + feedback.name + " show"+show);
-
-        float t = 0;
-        Vector2 startPos = feedback.anchoredPosition;
-        Vector2 endPos = show ? new Vector2(feedback.anchoredPosition.x, feedbackDownPos) : new Vector2(feedback.anchoredPosition.x, feedbackTopPos);
-
-        while (t < feedbackAnimationDuration)
+        else if (targetPOS==-1)
         {
-            t += Time.deltaTime;
-            float factor = feedbackAnimationCurve.Evaluate(t / feedbackAnimationDuration);
-            feedbackInvestOK.anchoredPosition = Vector2.Lerp(startPos, endPos, factor);
-            feedbackInvestNO.anchoredPosition = Vector2.Lerp(startPos, endPos, factor);
-            yield return null;
+            targetPositionOK=feedbackTopPos;
+            targetPositionNO=feedbackDownPos;
+            targetAlphaOK=0;
+            targetAlphaNO=1;
         }
-        feedbackInvestOK.anchoredPosition = endPos;
-        feedbackInvestNO.anchoredPosition = endPos;
-
-        if(!show)
-            feedback.gameObject.SetActive(false);
+        else if (targetPOS==0){
+            targetPositionOK=feedbackTopPos;
+            targetPositionNO=feedbackTopPos;
+            targetAlphaOK=0;
+            targetAlphaNO=0;
+        }
     }
 
 }

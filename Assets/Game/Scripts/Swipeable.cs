@@ -95,25 +95,30 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         {
             target = swipeRightRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
+            Debug.Log(p);
+            feedbackUI.SetTargetPosition(1);
             swipeDirection=1;
-            feedbackUI.ToggleFeedback(false, swipeDirection==1, true);
+
         }
         else if (dragDelta.x < -centerTreshold)
         {
 
             target = swipeLeftRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
+            feedbackUI.SetTargetPosition(-1);
             swipeDirection=-1;
-            feedbackUI.ToggleFeedback(false, swipeDirection==1, true);
+
 
         }
         else
         {
             target = swipeMiddleRef;
+            feedbackUI.SetTargetPosition(0);
             p = 1;
             swipeDirection=0;
-            feedbackUI.ToggleFeedback(true, swipeDirection==1, false);
+
         }
+
         targetPosition = Vector2.Lerp(initialElementPosition, target.anchoredPosition, p);
         targetRotation = Quaternion.Lerp(swipeableElement.rotation, target.rotation, p);
 
@@ -176,8 +181,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             swipeBackFaceCard.rotation = Quaternion.Lerp(Quaternion.Euler(new Vector3(0, 0, 0)), Quaternion.Euler(new Vector3(0, -90, 0)), validationAnimationCurve.Evaluate(p));
             yield return null;
         }
-
-
+        feedbackUI.ResetPositions();
         // Animate SwipeElement card towards 0°
         swipeableElement.anchoredPosition = swipeMiddleRef.anchoredPosition;
         swipeableElement.rotation = Quaternion.Euler(new Vector3(0, 90, 0));
@@ -193,5 +197,6 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
         swipeBackgroundImage.color = swipeBackgroundColor1;
         isAnimating = false;
+        
     }
 }
