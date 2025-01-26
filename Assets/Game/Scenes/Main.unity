@@ -2869,7 +2869,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Vos invetissements n\u2019ont pas port\xE9 leurs fruits !\r\nVous avez
+  m_text: "Vos investissements n\u2019ont pas port\xE9 leurs fruits !\r\nVous avez
     \xE9t\xE9 victime de la \r\nbulle \xE9conomique !\n\nSwipez pour recommencer
     une partie :)"
   m_isRightToLeft: 0

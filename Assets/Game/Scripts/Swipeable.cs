@@ -134,7 +134,6 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeRightRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             feedbackUI.SetTargetPosition(1);
-            //feedbackUI.SetText(true, currentFeedback.investSentence);
             swipeDirection=1;
 
         }
@@ -144,7 +143,6 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             target = swipeLeftRef;
             p = Mathf.Clamp01(Mathf.Abs(dragDelta.x) / dragTreshold);
             feedbackUI.SetTargetPosition(-1);
-            //feedbackUI.SetText(false, currentFeedback.investSentence);
             swipeDirection=-1;
 
 
@@ -173,7 +171,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             Player.instance.MoneyBid = (int)GetBidPercentage(maxBid, pBid);
             bidText.text = Player.instance.MoneyBid.ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
 
-            if(pBid==1){
+            if(Player.instance.MoneyBid==Player.instance.Money){
                 SetInvestFeedback(2);
             }
             else{
@@ -197,7 +195,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
             return max*0.1f;
         else if(percentage<0.5f)
             return max*0.25f;
-        else if(percentage<0.75f)
+        else if(percentage<0.9f)
             return max*0.5f;
         else
             return max;
