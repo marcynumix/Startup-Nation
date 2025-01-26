@@ -196,11 +196,8 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
 
     private IEnumerator ValidateSwipe()
     {
-        
         PlayInvestFeedbackSound();
         
-
-
         isAnimating = true;
 
         bool isBuy = swipeDirection == 1;
@@ -212,6 +209,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         }
         else {
             // Player.instance.Money += 100000;
+            StartupInvestCard.Instance.MutePitch();
         }
             
 
@@ -269,6 +267,7 @@ public class Swipeable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoin
         }
 
         swipeBackgroundImage.color = swipeBackgroundColor1;
+        StartupInvestCard.Instance.PlayPitch(1);
         isAnimating = false;
         
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 public class StartupInvestCard : MonoBehaviour
 {
@@ -16,8 +17,11 @@ public class StartupInvestCard : MonoBehaviour
     public TMPro.TextMeshProUGUI founderName;
     public TMPro.TextMeshProUGUI founderNameShadow;
 
+    public AudioSource audioSourcePitch;
+
     private string startupsFilePath;
     public List<string> startupNames;
+    public List<string> availableStartups = new List<string>();
 
     void Awake()
     {
@@ -26,6 +30,7 @@ public class StartupInvestCard : MonoBehaviour
 
     void Start()
     {
+        
         // Initialisation du chemin du fichier startups.json
         startupsFilePath = Path.Combine(Application.streamingAssetsPath, "startups.json");
 
@@ -48,6 +53,9 @@ public class StartupInvestCard : MonoBehaviour
         // Décoder les données JSON
         StartupList startupList = JsonUtility.FromJson<StartupList>(request.downloadHandler.text);
         startupNames = startupList.startups;
+        availableStartups = new List<string>(startupNames);
+        
+        
         Debug.Log($"Liste des startups chargée : {startupNames.Count} startups");
         if (startupNames == null || startupNames.Count == 0)
         {
@@ -63,6 +71,20 @@ public class StartupInvestCard : MonoBehaviour
         StartCoroutine(LoadRandomStartupCoroutine());
     }
 
+    private string GetAvailableRandomStartupName()
+    {
+        if (availableStartups.Count == 0)
+        {
+            availableStartups = new List<string>(startupNames);
+        }
+
+        int randomIndex = Random.Range(0, availableStartups.Count);
+        string randomStartupName = availableStartups[randomIndex];
+        availableStartups.RemoveAt(randomIndex);
+
+        return randomStartupName;
+    }
+
     private IEnumerator LoadRandomStartupCoroutine()
     {
         if (startupNames == null || startupNames.Count == 0)
@@ -72,7 +94,7 @@ public class StartupInvestCard : MonoBehaviour
         }
 
         // Choisir une startup aléatoire
-        string randomStartupName = startupNames[Random.Range(0, startupNames.Count)];
+        string randomStartupName = GetAvailableRandomStartupName();
 
         // Charger les données JSON de la startup
         string jsonFilePath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups", randomStartupName + ".json");
@@ -98,7 +120,24 @@ public class StartupInvestCard : MonoBehaviour
         // Debug.Log($"Chargement de l'image : {imageFilePath}");
         StartCoroutine(LoadStartupImage(imageFilePath));
         LoadFounderPortraitImage();
-        
+        string soundFileName = randomStartupName + "_founder.mp3";
+        string soundFilePath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups", soundFileName);    
+        StartCoroutine(LoadStartupPitchSound(soundFilePath));
+    }
+
+    public void MutePitch()
+    {
+        StopCoroutine(PlayPitchDelayed(0));
+        audioSourcePitch.Stop();
+    }
+    public void PlayPitch(float delay=0){
+        // play the audio clip
+        StopCoroutine(PlayPitchDelayed(delay));
+        StartCoroutine(PlayPitchDelayed(delay));
+    }
+    private IEnumerator PlayPitchDelayed(float delay){
+        yield return new WaitForSeconds(delay);
+        audioSourcePitch.Play();
     }
 
     private void LoadFounderPortraitImage(){
@@ -122,6 +161,25 @@ public class StartupInvestCard : MonoBehaviour
             {
                 Debug.LogWarning($"Erreur lors du chargement de l'image : {request.error}");
                 startupImage.sprite=null;
+            }
+        }
+    }
+
+    private IEnumerator LoadStartupPitchSound(string filePath){
+        Debug.Log($"Chargement du son : {filePath}");
+        using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(filePath, AudioType.MPEG))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
+                audioSourcePitch.clip = clip;
+            }
+            else
+            {
+                audioSourcePitch.clip =null;
+                Debug.LogWarning($"Erreur lors du chargement du son : {request.error}");
             }
         }
     }
