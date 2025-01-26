@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Yes_yes1
   m_EditorClassIdentifier: 
   investSound: {fileID: 8300000, guid: 29898341939ace34ba4757aaef7f23dd, type: 3}
-  investSentence: Yes!
+  investSentence: Buy
   positiveness: 1

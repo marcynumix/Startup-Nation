@@ -22,7 +22,7 @@ public class StartupInvestCard : MonoBehaviour
     private string startupsFilePath;
     public List<string> startupNames;
     public List<string> availableStartups = new List<string>();
-
+    public StartupData currentStartup=null;
     void Awake()
     {
         Instance = this;
@@ -108,15 +108,15 @@ public class StartupInvestCard : MonoBehaviour
         }
 
         // Convertir les données JSON
-        StartupData startup = JsonUtility.FromJson<StartupData>(jsonRequest.downloadHandler.text);
+        currentStartup = JsonUtility.FromJson<StartupData>(jsonRequest.downloadHandler.text);
 
         // MAJ Metrics UI
-        MetricsUI.instance.SetMetrics(startup.SuccessRate);
+        MetricsUI.instance.SetMetrics(currentStartup.SuccessRate);
 
         // Mettre à jour les champs de l'UI
-        startupName.text = startup.StartupName;
-        founderName.text = founderNameShadow.text = startup.FounderName;
-        startupPitch.text = startup.Pitch;
+        startupName.text = currentStartup.StartupName;
+        founderName.text = founderNameShadow.text = currentStartup.FounderName;
+        startupPitch.text = currentStartup.Pitch;
 
         // Charger l'image correspondante
         string imageFilePath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups", randomStartupName + "_founder.png");
@@ -193,14 +193,15 @@ public class StartupInvestCard : MonoBehaviour
         public List<string> startups;
     }
 
-    [System.Serializable]
-    private class StartupData
-    {
-        public string StartupName;
-        public string FounderName;
-        public string foundertrait;
-        public string Pitch;
-        public float SuccessRate;
-        public string FounderSex;
-    }
+
+}
+[System.Serializable]
+public class StartupData
+{
+    public string StartupName;
+    public string FounderName;
+    public string foundertrait;
+    public string Pitch;
+    public float SuccessRate;
+    public string FounderSex;
 }
