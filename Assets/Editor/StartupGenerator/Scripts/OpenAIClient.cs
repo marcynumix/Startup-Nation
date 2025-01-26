@@ -97,54 +97,41 @@ public class OpenAIClient : MonoBehaviour
             model = _model // Ajouter le modèle explicitement
         };
 
-        //Execute "main.exe" from "/Resources" folder
-        System.Diagnostics.Process process = new System.Diagnostics.Process();
-        process.StartInfo.FileName = Application.dataPath + "/Resources/main.exe";
-        process.StartInfo.Arguments = "192.168.1.72:8188" + " " + requestData.prompt;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.Start();
-        process.WaitForExit();
+        string json = JsonUtility.ToJson(requestData);
 
+        using (UnityWebRequest request = new UnityWebRequest(apiImageUrl, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+            request.SetRequestHeader("Authorization", "Bearer " + apiKey);
 
+            yield return request.SendWebRequest();
 
-        yield return null;
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string response = request.downloadHandler.text;
+                ImageResponse imageResponse = JsonUtility.FromJson<ImageResponse>(response);
 
-        //string json = JsonUtility.ToJson(requestData);
-
-        //using (UnityWebRequest request = new UnityWebRequest(apiImageUrl, "POST"))
-        //{
-        //    byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(json);
-        //    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-        //    request.downloadHandler = new DownloadHandlerBuffer();
-        //    request.SetRequestHeader("Content-Type", "application/json");
-        //    request.SetRequestHeader("Authorization", "Bearer " + apiKey);
-
-        //    yield return request.SendWebRequest();
-
-        //    if (request.result == UnityWebRequest.Result.Success)
-        //    {
-        //        string response = request.downloadHandler.text;
-        //        ImageResponse imageResponse = JsonUtility.FromJson<ImageResponse>(response);
-
-        //        if (imageResponse != null && imageResponse.data != null && imageResponse.data.Length > 0)
-        //        {
-        //            string imageUrl = imageResponse.data[0].url;
-        //            yield return DownloadImage(imageUrl, tcs);
-        //        }
-        //        else
-        //        {
-        //            Debug.LogError("Image generation failed: No data returned.");
-        //            tcs.SetResult(null);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        string error = $"Error: {request.error}\nResponse Code: {request.responseCode}\nResponse Body: {request.downloadHandler.text}";
-        //        Debug.LogError(error);
-        //        tcs.SetResult(null);
-        //    }
-        //}
+                if (imageResponse != null && imageResponse.data != null && imageResponse.data.Length > 0)
+                {
+                    string imageUrl = imageResponse.data[0].url;
+                    yield return DownloadImage(imageUrl, tcs);
+                }
+                else
+                {
+                    Debug.LogError("Image generation failed: No data returned.");
+                    tcs.SetResult(null);
+                }
+            }
+            else
+            {
+                string error = $"Error: {request.error}\nResponse Code: {request.responseCode}\nResponse Body: {request.downloadHandler.text}";
+                Debug.LogError(error);
+                tcs.SetResult(null);
+            }
+        }
     }
 
     private static IEnumerator DownloadImage(string imageUrl, TaskCompletionSource<Texture2D> tcs)

@@ -11,7 +11,6 @@ public class StartupGeneratorWindow : EditorWindow
     private Vector2 scrollPosition; // Pour le défilement horizontal des mots-clés
     private string systemPrompt = ""; // Contenu du fichier de system prompt
     private string startupPrompt = ""; // Contenu du fichier de prompt
-    private string founderImagePrompt = ""; // Contenu du fichier de founder image prompt
     private bool showConfiguration = true; // État du groupe "Configuration"
     private bool showConfigurationData = true; // État du groupe "Configuration Data"
     private bool showGenerateStartups = true; // État du groupe "Generate Startups"
@@ -44,7 +43,6 @@ public class StartupGeneratorWindow : EditorWindow
         LoadKeywordFiles();
         LoadStartupPrompt();
         LoadSystemPrompt();
-        LoadFounderImagePrompt();
     }
 
     private void LoadKeywordFiles()
@@ -93,7 +91,7 @@ public class StartupGeneratorWindow : EditorWindow
 
         try
         {
-            File.WriteAllText(systemPromptFilePath, systemPrompt); // Sauvegarder le contenu dans le fichier
+            File.WriteAllText(systemPromptFilePath, systemPrompt); // Sauvegarder le contenu dans le fichie
             Debug.Log("System prompt saved successfully.");
         }
         catch (System.Exception ex)
@@ -132,39 +130,7 @@ public class StartupGeneratorWindow : EditorWindow
         {
             Debug.LogError($"Failed to save prompt: {ex.Message}");
         }
-    }
-
-    private void LoadFounderImagePrompt()
-    {
-        // Chemin vers le fichier de founder image prompt
-        string founderImagePromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/founder-image-prompt.txt");
-
-        if (File.Exists(founderImagePromptFilePath))
-        {
-            founderImagePrompt = File.ReadAllText(founderImagePromptFilePath); // Lire tout le fichier
-        }
-        else
-        {
-            Debug.LogError($"Founder image prompt file not found at: {founderImagePromptFilePath}");
-            founderImagePrompt = "Founder image prompt file not found!";
-        }
-    }
-
-    private void SaveFounderImagePrompt()
-    {
-        // Chemin vers le fichier de founder image prompt
-        string founderImagePromptFilePath = Path.Combine(Application.dataPath, "Editor/StartupGenerator/Prompts/founder-image-prompt.txt");
-
-        try
-        {
-            File.WriteAllText(founderImagePromptFilePath, founderImagePrompt); // Sauvegarder le contenu dans le fichier
-            Debug.Log("Founder image prompt saved successfully.");
-        }
-        catch (System.Exception ex)
-        {
-            Debug.LogError($"Failed to save founder image prompt: {ex.Message}");
-        }
-    }
+    }    
 
     private void OnGUI()
     {
@@ -231,17 +197,7 @@ public class StartupGeneratorWindow : EditorWindow
                 SaveStartupPrompt(); // Sauvegarde du prompt
             }
 
-            GUILayout.Space(10);
-            GUILayout.Label("Founder Image Prompt:", EditorStyles.label);
-
-            founderImagePrompt = EditorGUILayout.TextArea(founderImagePrompt, textAreaStyle, GUILayout.Height(50));
-
-            if (GUILayout.Button("Save Founder Image Prompt"))
-            {
-                SaveFounderImagePrompt(); // Sauvegarde du founder image prompt
-            }
-
-            GUILayout.Space(10);
+            GUILayout.Space(10);    
 
             showConfigurationData = EditorGUILayout.Foldout(showConfigurationData, "Data");
             if (showConfigurationData)
