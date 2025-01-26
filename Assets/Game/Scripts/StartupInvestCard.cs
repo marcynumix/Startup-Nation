@@ -9,10 +9,12 @@ public class StartupInvestCard : MonoBehaviour
 {
     public static StartupInvestCard Instance { get; private set; }
     public TMPro.TextMeshProUGUI startupName;
-    public Image founderImage;
+    public Image startupImage;
+    public Image founderPortraitImage;
+    public Sprite[] founderPortraits;
     public TMPro.TextMeshProUGUI startupPitch;
     public TMPro.TextMeshProUGUI founderName;
-
+    public TMPro.TextMeshProUGUI founderNameShadow;
 
     private string startupsFilePath;
     public List<string> startupNames;
@@ -88,16 +90,24 @@ public class StartupInvestCard : MonoBehaviour
 
         // Mettre à jour les champs de l'UI
         startupName.text = startup.StartupName;
-        founderName.text = startup.FounderName;
+        founderName.text = founderNameShadow.text = startup.FounderName;
         startupPitch.text = startup.Pitch;
 
         // Charger l'image correspondante
         string imageFilePath = Path.Combine(Application.streamingAssetsPath, "GeneratedStartups", randomStartupName + "_founder.png");
         Debug.Log($"Chargement de l'image : {imageFilePath}");
-        StartCoroutine(LoadImage(imageFilePath));
+        StartCoroutine(LoadStartupImage(imageFilePath));
+        LoadFounderPortraitImage();
+        
     }
 
-    private IEnumerator LoadImage(string filePath)
+    private void LoadFounderPortraitImage(){
+        // Randomize founder portrait image
+        int id = Random.Range(0, founderPortraits.Length);
+        founderPortraitImage.sprite = founderPortraits[id];
+    }
+
+    private IEnumerator LoadStartupImage(string filePath)
     {
         using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(filePath))
         {
@@ -106,12 +116,12 @@ public class StartupInvestCard : MonoBehaviour
             if (request.result == UnityWebRequest.Result.Success)
             {
                 Texture2D texture = DownloadHandlerTexture.GetContent(request);
-                founderImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                startupImage.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
             }
             else
             {
                 Debug.LogWarning($"Erreur lors du chargement de l'image : {request.error}");
-                founderImage.sprite=null;
+                startupImage.sprite=null;
             }
         }
     }
